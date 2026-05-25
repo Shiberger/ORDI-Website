@@ -50,94 +50,72 @@
 
 ## 3. Project Structure
 
+The repo is split into two top-level workspaces: `front-end/` (Next.js app) and `back-end/` (reserved for any future server-side service — Supabase migrations, scripts, etc.). The Next.js app is self-contained inside `front-end/` — that's where you run `npm install`, `npm run dev`, and `npm run build`.
+
 ```
-ordi/
-├── app/                          # Next.js App Router pages
-│   ├── (storefront)/             # Public-facing routes
+ORDI-Website/
+├── front-end/                    # Next.js app (this is where all npm commands run)
+│   ├── app/                      # Next.js App Router pages
 │   │   ├── page.tsx              # Home
 │   │   ├── shop/
 │   │   │   ├── page.tsx          # Shop listing
-│   │   │   └── [slug]/page.tsx   # Product detail
+│   │   │   ├── layout.tsx        # Per-route metadata
+│   │   │   └── [slug]/page.tsx   # Product detail (SSG)
 │   │   ├── about/page.tsx
 │   │   ├── journal/page.tsx
-│   │   └── membership/page.tsx
-│   ├── (commerce)/               # Cart + checkout flow
+│   │   ├── membership/page.tsx
 │   │   ├── cart/page.tsx
 │   │   ├── checkout/page.tsx
-│   │   └── checkout/success/page.tsx
-│   ├── (account)/                # Auth-required routes
+│   │   ├── checkout/success/page.tsx
 │   │   ├── account/page.tsx
-│   │   └── account/orders/page.tsx
-│   ├── auth/
-│   │   ├── login/page.tsx
-│   │   ├── register/page.tsx
-│   │   └── callback/route.ts     # OAuth callback handler
-│   ├── api/
-│   │   ├── checkout/session/route.ts   # Stripe Checkout
-│   │   ├── webhooks/stripe/route.ts    # Stripe webhook
-│   │   └── newsletter/route.ts
-│   ├── layout.tsx                # Root layout (Nav + Footer)
-│   ├── globals.css               # All styles
-│   └── not-found.tsx
+│   │   ├── account/orders/page.tsx
+│   │   ├── auth/
+│   │   │   ├── login/page.tsx
+│   │   │   ├── register/page.tsx
+│   │   │   └── callback/route.ts # OAuth callback (Phase 2)
+│   │   ├── api/
+│   │   │   ├── checkout/session/route.ts   # Stripe Checkout (Phase 3)
+│   │   │   ├── webhooks/stripe/route.ts    # Stripe webhook (Phase 3)
+│   │   │   └── newsletter/route.ts         # (Phase 4)
+│   │   ├── layout.tsx            # Root layout (Nav + Footer + AppProvider)
+│   │   ├── globals.css           # All styles
+│   │   ├── sitemap.ts
+│   │   ├── robots.ts
+│   │   └── not-found.tsx
+│   │
+│   ├── components/
+│   │   ├── layout/               # Nav, Footer, CartDrawer
+│   │   ├── product/              # ProductDetail, SocialOrderButtons (Phase 4)
+│   │   └── ui/                   # MonoTag, SectionHead, Marquee, BottleSlot
+│   │
+│   ├── lib/
+│   │   ├── supabase/             # client.ts / server.ts / middleware (Phase 2)
+│   │   ├── stripe/               # client.ts / server.ts (Phase 3)
+│   │   ├── data/                 # products.ts, journal.ts, ui-strings.ts
+│   │   ├── context/AppContext.tsx
+│   │   └── utils.ts              # cn(), formatPrice(), isDarkHue()
+│   │
+│   ├── types/                    # product.ts, order.ts, user.ts
+│   ├── public/images/products/   # Product photography
+│   ├── _legacy/                  # Frozen Phase 0 React + CDN prototype
+│   │
+│   ├── middleware.ts             # Next.js middleware (Supabase session, Phase 2)
+│   ├── next.config.ts
+│   ├── tsconfig.json
+│   ├── package.json
+│   ├── .env.local                # NEVER commit
+│   └── .env.example              # Template for env vars
 │
-├── components/
-│   ├── layout/
-│   │   ├── Nav.tsx
-│   │   ├── Footer.tsx
-│   │   └── CartDrawer.tsx
-│   ├── product/
-│   │   ├── ProductCard.tsx
-│   │   ├── ProductPyramid.tsx
-│   │   ├── SizeSelector.tsx
-│   │   └── SocialOrderButtons.tsx
-│   ├── ui/
-│   │   ├── MonoTag.tsx
-│   │   ├── SectionHead.tsx
-│   │   ├── Marquee.tsx
-│   │   └── Button.tsx
-│   └── home/
-│       ├── Hero.tsx
-│       ├── CollectionGrid.tsx
-│       ├── SkinScentTease.tsx
-│       └── PressQuotes.tsx
+├── back-end/                     # Reserved for future server-side code
+│   └── supabase/                 # SQL migrations (added in Phase 2)
 │
-├── lib/
-│   ├── supabase/
-│   │   ├── client.ts             # Browser client
-│   │   ├── server.ts             # Server client (RSC + API routes)
-│   │   └── middleware.ts         # Session middleware
-│   ├── stripe/
-│   │   ├── client.ts             # Stripe.js loader
-│   │   └── server.ts             # Stripe Node SDK
-│   ├── data/
-│   │   ├── products.ts           # Product catalog (typed)
-│   │   ├── journal.ts
-│   │   └── ui-strings.ts         # i18n strings (en/th)
-│   └── context/
-│       └── AppContext.tsx        # Cart, wishlist, language state
-│
-├── types/
-│   ├── product.ts
-│   ├── order.ts
-│   └── user.ts
-│
-├── public/
-│   └── images/
-│       └── products/             # Product photography
-│
-├── supabase/
-│   └── migrations/               # SQL migrations
-│
-├── middleware.ts                 # Next.js middleware (Supabase session)
-├── next.config.ts
-├── tsconfig.json
-├── package.json
-├── .env.local                    # NEVER commit
-├── .env.example                  # Template for env vars
 ├── CLAUDE.md                     # This file
 ├── Project-dev.md                # Phase tracking
-└── README.md
+├── README.md
+└── .gitignore
 ```
+
+**Working directory note:** `package.json` lives at `front-end/package.json`. Always run npm commands from inside `front-end/` (or use `npm --prefix front-end <cmd>` from the repo root).
 
 ---
 

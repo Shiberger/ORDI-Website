@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mv d:/Work/Programming/ORDI-Website/frontend d:/Work/Programming/ORDI-Website/_legacy && ls d:/Work/Programming/ORDI-Website/)",
+      "Bash(npm --version)",
+      "Bash(npm install *)",
+      "Bash(npm run *)"
+    ],
+    "additionalDirectories": [
+      "d:\\Work\\Programming\\ORDI-Website\\frontend"
+    ]
+  }
+}

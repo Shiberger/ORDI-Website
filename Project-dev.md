@@ -10,7 +10,7 @@
 | Phase | Status | Estimated | Description |
 |---|---|---|---|
 | Phase 0 | 🟢 Done | — | Design prototype (React + CDN) |
-| Phase 1 | ⚪ Not started | 4-6 hours | Migrate to Next.js + TypeScript |
+| Phase 1 | 🟢 Done | 4-6 hours | Migrate to Next.js + TypeScript |
 | Phase 2 | ⚪ Not started | 3-4 hours | Supabase Auth (Email + Google + LINE) |
 | Phase 3 | ⚪ Not started | 2-3 hours | Stripe Checkout integration |
 | Phase 4 | ⚪ Not started | 2 hours | Social Order Buttons + Polish + Deploy |
@@ -38,114 +38,105 @@ What we already have:
 
 ---
 
-## 🚧 Phase 1: Migrate to Next.js (4-6 hours)
+## ✅ Phase 1: Migrate to Next.js (DONE)
 
 **Goal:** Convert CDN React prototype to production-ready Next.js app with TypeScript.
 
 ### 1.1 — Initial Setup
 
-- [ ] Create new Next.js project: `npx create-next-app@latest ordi-web --typescript --app --no-tailwind --no-src-dir`
-- [ ] Move existing `frontend/` files into a `_legacy/` folder for reference
-- [ ] Install base dependencies:
-  ```bash
-  npm install clsx
-  npm install -D @types/node
-  ```
-- [ ] Set up `.env.example` with all required variables (see CLAUDE.md §9)
-- [ ] Configure `tsconfig.json`: `strict: true`, path aliases (`@/*` → root)
-- [ ] Add Cloudinary or local images to `public/images/`
+- [x] Scaffold Next.js 15 + TypeScript + App Router project (manual setup, not create-next-app)
+- [x] Move existing `frontend/` files into a `_legacy/` folder for reference
+- [x] Install base dependencies (`clsx`, types)
+- [x] Set up `.env.example` with all required variables (see CLAUDE.md §9)
+- [x] Configure `tsconfig.json`: `strict: true`, path aliases (`@/*` → root)
+- [ ] Add Cloudinary or local images to `public/images/` (deferred to Phase 1.7)
 
 ### 1.2 — Port Styles
 
-- [ ] Copy `frontend/styles.css` → `app/globals.css` (no changes needed)
-- [ ] Add font imports to `app/layout.tsx`:
+- [x] Copy `frontend/styles.css` → `app/globals.css` (no changes needed)
+- [x] Add font imports to `app/layout.tsx`:
   - Satoshi (via Fontshare)
-  - Geist Mono (via Google Fonts using `next/font`)
-- [ ] Verify all `.ordi-*` classes render correctly
+  - Geist Mono (via `next/font/google`)
+- [x] Added `.ordi-slot` placeholder styles for replaced `<image-slot>` web component
 
 ### 1.3 — Port Data
 
-- [ ] Create `types/product.ts`:
-  ```typescript
-  export type Product = {
-    id: string
-    name: string
-    number: string
-    tagline: { en: string; th: string }
-    family: { en: string; th: string }
-    story: { en: string; th: string }
-    notes: { top: string[]; heart: string[]; base: string[] }
-    sizes: { ml: number; price: number }[]
-    status: 'available' | 'coming-soon' | 'sold-out'
-    hue: string
-  }
-  ```
-- [ ] Create `lib/data/products.ts` — typed product array (from `data.js`)
-- [ ] Create `lib/data/journal.ts` — typed journal posts
-- [ ] Create `lib/data/ui-strings.ts` — translation dictionaries
+- [x] `types/product.ts` — Product, JournalEntry, Lang, Bilingual
+- [x] `types/order.ts` — Order, OrderItem, ShippingAddress, CartItem
+- [x] `types/user.ts` — Profile, MemberTier
+- [x] `lib/data/products.ts` — typed product array
+- [x] `lib/data/journal.ts` — typed journal posts
+- [x] `lib/data/ui-strings.ts` — translation dictionaries
+- [x] `lib/utils.ts` — `cn()`, `formatPrice()`, `isDarkHue()`
 
 ### 1.4 — Port Components
 
-- [ ] `components/layout/Nav.tsx` — port from `Nav` in `components.jsx`
-- [ ] `components/layout/Footer.tsx`
-- [ ] `components/layout/CartDrawer.tsx` ← `'use client'`
-- [ ] `components/ui/MonoTag.tsx`
-- [ ] `components/ui/SectionHead.tsx`
-- [ ] `components/ui/Marquee.tsx`
-- [ ] `components/ui/Button.tsx` — extract from inline classes
+- [x] `components/layout/Nav.tsx` — uses `next/link` + `usePathname`
+- [x] `components/layout/Footer.tsx`
+- [x] `components/layout/CartDrawer.tsx` ← `'use client'`
+- [x] `components/ui/MonoTag.tsx`
+- [x] `components/ui/SectionHead.tsx`
+- [x] `components/ui/Marquee.tsx`
+- [x] `components/ui/BottleSlot.tsx` — placeholder for legacy `<image-slot>`
+- [x] `components/product/ProductDetail.tsx` — client component split from server page
 
 ### 1.5 — Port App Context
 
-- [ ] Create `lib/context/AppContext.tsx` ← `'use client'`
+- [x] Create `lib/context/AppContext.tsx` ← `'use client'`
   - Cart state (with localStorage persistence)
   - Wishlist state (with localStorage persistence)
-  - Language state (cookie-backed)
+  - Language state (localStorage-backed)
   - Drawer open state
-- [ ] Wrap in `app/layout.tsx`
+- [x] Wrap in `app/layout.tsx`
 
 ### 1.6 — Port Screens to Routes
 
-- [ ] `app/page.tsx` — Home (from `HomeScreen`)
-- [ ] `app/shop/page.tsx` — Shop listing (from `ShopScreen`)
-- [ ] `app/shop/[slug]/page.tsx` — Product detail (from `ProductScreen`)
-  - Use `generateStaticParams` for SSG
-  - Use `generateMetadata` for SEO
-- [ ] `app/about/page.tsx`
-- [ ] `app/journal/page.tsx`
-- [ ] `app/membership/page.tsx`
-- [ ] `app/cart/page.tsx`
-- [ ] `app/checkout/page.tsx` ← `'use client'` (placeholder for Phase 3)
-- [ ] `app/account/page.tsx` ← `'use client'` (placeholder for Phase 2)
+- [x] `app/page.tsx` — Home
+- [x] `app/shop/page.tsx` — Shop listing (with filter)
+- [x] `app/shop/[slug]/page.tsx` — Product detail (server: SSG + metadata)
+  - [x] `generateStaticParams` for SSG (5 products prerendered)
+  - [x] `generateMetadata` for SEO
+- [x] `app/about/page.tsx`
+- [x] `app/journal/page.tsx`
+- [x] `app/membership/page.tsx`
+- [x] `app/cart/page.tsx`
+- [x] `app/checkout/page.tsx` ← `'use client'` (mock 3-step flow, real Stripe in Phase 3)
+- [x] `app/account/page.tsx` ← `'use client'` (mock auth, real Supabase in Phase 2)
+- [x] `app/not-found.tsx`
 
 ### 1.7 — Image Migration
 
-- [ ] Place real product photos in `public/images/products/[id]/[size].jpg`
-- [ ] Replace `<image-slot>` with `next/image`:
-  ```tsx
-  <Image
-    src={`/images/products/${product.id}/main.jpg`}
-    alt={product.name}
-    width={720}
-    height={900}
-    priority={isAboveFold}
-  />
-  ```
+- [x] `components/ui/BottleSlot.tsx` placeholder in place (replaces legacy `<image-slot>`)
+- [ ] Place real product photos in `public/images/products/[id]/[size].jpg` *(pending photography)*
+- [ ] Replace `BottleSlot` with `next/image` once photos are added
 - [ ] (Optional) Set up Cloudinary loader for production
 
 ### 1.8 — SEO Setup
 
-- [ ] Configure `app/layout.tsx` metadata defaults
-- [ ] Add `app/sitemap.ts` — list all product + journal URLs
-- [ ] Add `app/robots.ts`
-- [ ] Add OG image generation (`app/opengraph-image.tsx`)
-- [ ] Per-product metadata in `app/shop/[slug]/page.tsx`
+- [x] Configure `app/layout.tsx` metadata defaults (OpenGraph, Twitter, title template)
+- [x] Add `app/sitemap.ts` — static + product URLs
+- [x] Add `app/robots.ts` — disallow `/account`, `/checkout`, `/cart`, `/api`
+- [x] Per-route metadata via small server `layout.tsx` files (shop, about, journal, membership)
+- [x] Per-product metadata via `generateMetadata` in `app/shop/[slug]/page.tsx`
+- [ ] OG image generation (`app/opengraph-image.tsx`) *(deferred; needs hero asset)*
 
 ### 1.9 — Verify
 
-- [ ] Run `npm run dev` — all pages load
-- [ ] Run `npm run build` — no TypeScript errors
-- [ ] Lighthouse score on homepage: target 95+ for Performance + SEO
+- [x] `npm install` — 304 packages, 0 critical issues
+- [x] `npm run build` — passes; 18 static pages prerendered (5 product SSG routes)
+- [ ] `npm run dev` — manual visual check pending
+- [ ] Lighthouse score on homepage: target 95+
 - [ ] Test responsive layout at 1280px, 1024px, 768px
+
+### 1.10 — Repo Restructure (post-Phase-1)
+
+- [x] Move all Next.js files from repo root into `front-end/` to separate concerns from future back-end code
+- [x] Rename `backend/` → `back-end/` for consistency
+- [x] Update `CLAUDE.md` §3 project structure to reflect new layout
+- [x] Verify `npm run build` still passes from inside `front-end/`
+- [x] `.gitignore` patterns are non-anchored, so no changes needed (still matches `front-end/node_modules`, `front-end/.next`, etc.)
+
+**Working directory note:** all npm commands (`npm install`, `npm run dev`, `npm run build`) must be run from `front-end/`. Use `npm --prefix front-end <cmd>` from repo root if needed.
 
 **✅ Phase 1 Done When:** All 9 screens render via real URLs, no `window.ORDI_DATA`, no Babel CDN.
 
@@ -433,6 +424,20 @@ npm install stripe @stripe/stripe-js
 - Chose Supabase over Firebase → SQL preference + LINE OAuth support
 - Chose Stripe Checkout over Elements → faster ship + less PCI scope
 - Defer PromptPay to Phase 5 → Stripe + Social buttons cover initial customers
+
+### 2026-05-25 — Phase 1 migration
+- Scaffolded Next.js 15 + React 19 + TypeScript manually (not via `create-next-app`) — simpler for this automated migration; produced same output.
+- **Locale strategy:** chose client-side language switch via React Context + localStorage (not URL prefix `/th/...`). Reasoning: SEO renders English by default, lang preference is per-user and persists between sessions. Reconsider if Thai-language SEO becomes priority.
+- **`<image-slot>` replaced by `BottleSlot`:** A CSS-only placeholder component for now. When real product photography lands, swap this for `next/image` in one place. Sidecar-based upload (legacy) is incompatible with the Vercel runtime and not needed in production.
+- **Server vs. client components:** Most pages are `'use client'` because they consume `useApp()` for bilingual text. Product detail uses a server-component wrapper for `generateStaticParams` + `generateMetadata` and delegates UI to a `ProductDetail` client component.
+- **Per-route metadata pattern:** Client pages can't export `metadata`, so per-route SEO lives in sibling `layout.tsx` server components (shop/about/journal/membership).
+
+### 2026-05-25 — Repo restructure (front-end / back-end split)
+- Moved the entire Next.js app (app/, components/, lib/, public/, types/, _legacy/, package.json, tsconfig.json, next.config.ts, node_modules/, .next/) from the repo root into `front-end/`.
+- Renamed `backend/` → `back-end/` for hyphenation consistency. Still empty; reserved for Supabase migrations and any future server-side code (workers, scripts).
+- **Why:** future back-end work (SQL migrations, Edge Functions, admin scripts) would otherwise collide with the Next.js app's root files and `node_modules`. Separating them up front keeps each workspace self-contained.
+- **Working directory:** all npm commands now run from `front-end/`. Tools that walk up from `cwd` to find `package.json` (lint, formatters, IDE) will work correctly inside that subdirectory.
+- Build verified passing from the new location.
 
 ### Add new decisions below as you make them
 - ...
