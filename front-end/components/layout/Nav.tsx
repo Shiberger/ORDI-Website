@@ -21,7 +21,7 @@ export function Nav() {
     { href: '/shop', label: t.nav.shop },
     { href: '/journal', label: t.nav.journal },
     { href: '/about', label: t.nav.about },
-    { href: '/account', label: t.nav.account },
+    // Account link hidden until Phase 2 wires up Supabase Auth.
   ]
 
   return (

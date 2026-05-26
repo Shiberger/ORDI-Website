@@ -1588,6 +1588,23 @@ main {
   outline: none;
 }
 .ordi-auth__forgot { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; color: var(--ink-soft); text-decoration: underline; align-self: flex-end; }
+.ordi-auth__forgot.is-disabled { text-decoration: line-through; opacity: 0.5; cursor: not-allowed; }
+.ordi-auth__notice {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  border: 1px solid var(--ink);
+  background: var(--paper-2);
+  font-family: var(--serif);
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--ink);
+  margin: 0;
+}
+.ordi-auth__form input:disabled { opacity: 0.45; cursor: not-allowed; border-bottom-style: dashed; }
+.ordi-btn--ghost:disabled { opacity: 0.45; cursor: not-allowed; }
+.ordi-btn--ghost:disabled:hover { background: transparent; color: var(--ink); }
 .ordi-auth__or {
   text-align: center;
   font-family: var(--mono);

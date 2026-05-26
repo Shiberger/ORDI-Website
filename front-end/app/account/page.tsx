@@ -12,7 +12,13 @@ type Mode = 'sign-in' | 'sign-up'
 export default function AccountPage() {
   const { lang, t } = useApp()
   const [mode, setMode] = useState<Mode>('sign-in')
+  // Sign-in is disabled until Phase 2 wires up Supabase Auth.
+  // The signed-in dashboard below uses mocked data and is kept for the Phase 2 integration.
   const [signed, setSigned] = useState(false)
+  const phase2Notice =
+    lang === 'en'
+      ? 'Member sign-in arrives with the next release.'
+      : 'การเข้าสู่ระบบสมาชิกจะเปิดให้ใช้งานในเวอร์ชันถัดไป'
 
   if (signed) {
     return (
@@ -152,44 +158,49 @@ export default function AccountPage() {
                 ? <span>Become <em>Ous</em>.</span>
                 : <span>เป็น <em>Ous</em></span>}
           </h1>
+          <p className="ordi-auth__notice">
+            <MonoTag>↘ COMING IN PHASE 2</MonoTag>
+            <span>{phase2Notice}</span>
+          </p>
           {mode === 'sign-up' && (
             <div className="ordi-form-row">
               <label>
                 <span>{lang === 'en' ? 'First name' : 'ชื่อ'}</span>
-                <input />
+                <input disabled />
               </label>
               <label>
                 <span>{lang === 'en' ? 'Last name' : 'นามสกุล'}</span>
-                <input />
+                <input disabled />
               </label>
             </div>
           )}
           <label>
             <span>{lang === 'en' ? 'Email' : 'อีเมล'}</span>
-            <input placeholder="you@email" />
+            <input placeholder="you@email" disabled />
           </label>
           <label>
             <span>{lang === 'en' ? 'Password' : 'รหัสผ่าน'}</span>
-            <input type="password" placeholder="••••••••" />
+            <input type="password" placeholder="••••••••" disabled />
           </label>
           <button
             className="ordi-btn ordi-btn--primary ordi-btn--full"
-            onClick={() => setSigned(true)}
+            disabled
+            aria-disabled="true"
           >
             {mode === 'sign-in' ? t.cta.sign_in : t.cta.sign_up} →
           </button>
           {mode === 'sign-in' && (
-            <a className="ordi-auth__forgot">
+            <span className="ordi-auth__forgot is-disabled">
               {lang === 'en' ? 'Forgot password?' : 'ลืมรหัสผ่าน?'}
-            </a>
+            </span>
           )}
           <div className="ordi-auth__or">
             <span>{lang === 'en' ? 'or' : 'หรือ'}</span>
           </div>
-          <button className="ordi-btn ordi-btn--ghost ordi-btn--full">
+          <button className="ordi-btn ordi-btn--ghost ordi-btn--full" disabled aria-disabled="true">
             Continue with Google
           </button>
-          <button className="ordi-btn ordi-btn--ghost ordi-btn--full">
+          <button className="ordi-btn ordi-btn--ghost ordi-btn--full" disabled aria-disabled="true">
             Continue with LINE
           </button>
         </div>
