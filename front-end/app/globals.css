@@ -763,6 +763,29 @@ main {
   letter-spacing: 0.08em;
   color: rgba(245, 242, 236, 0.55);
 }
+.ordi-footer__lang {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.ordi-footer__langbtn {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  color: rgba(245, 242, 236, 0.55);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.ordi-footer__langbtn:hover {
+  color: rgba(245, 242, 236, 0.85);
+}
+.ordi-footer__langbtn.is-active {
+  color: var(--paper);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 
 /* ============================================================
    CART DRAWER

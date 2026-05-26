@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useApp } from '@/lib/context/AppContext'
 
 export function Footer() {
-  const { t, lang } = useApp()
+  const { t, lang, setLang } = useApp()
   return (
     <footer className="ordi-footer">
       <div className="ordi-footer__top">
@@ -49,7 +49,27 @@ export function Footer() {
       <div className="ordi-footer__bottom">
         <div>© ORDI ATELIER {new Date().getFullYear()}</div>
         <div className="ordi-footer__origin">{t.origin}</div>
-        <div>EN · TH · {lang === 'en' ? 'Showing English' : 'กำลังแสดงภาษาไทย'}</div>
+        <div className="ordi-footer__lang" role="group" aria-label="Language">
+          <button
+            type="button"
+            className={`ordi-footer__langbtn${lang === 'en' ? ' is-active' : ''}`}
+            onClick={() => setLang('en')}
+            aria-pressed={lang === 'en'}
+          >
+            EN
+          </button>
+          <span aria-hidden="true">·</span>
+          <button
+            type="button"
+            className={`ordi-footer__langbtn${lang === 'th' ? ' is-active' : ''}`}
+            onClick={() => setLang('th')}
+            aria-pressed={lang === 'th'}
+          >
+            TH
+          </button>
+          <span aria-hidden="true">·</span>
+          <span>{lang === 'en' ? 'Showing English' : 'กำลังแสดงภาษาไทย'}</span>
+        </div>
       </div>
     </footer>
   )
