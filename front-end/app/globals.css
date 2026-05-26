@@ -1502,6 +1502,21 @@ main {
 .ordi-about__founders-copy { display: flex; flex-direction: column; gap: 20px; align-items: flex-start; }
 .ordi-about__founders-copy p { font-size: 16px; line-height: 1.6; color: var(--ink-soft); margin: 0; max-width: 460px; }
 
+.ordi-about__journal-cta {
+  display: flex;
+  justify-content: center;
+  padding: var(--section-y-sm) 0;
+  border-bottom: 1px solid var(--ink);
+}
+
+.ordi-about__team { padding-top: var(--section-y-sm); }
+
+.ordi-about__thanks {
+  padding: var(--section-y-sm) 0;
+  border-top: 1px solid var(--ink);
+  margin-top: var(--section-y-sm);
+}
+
 /* ============================================================
    JOURNAL
    ============================================================ */
@@ -2058,4 +2073,5 @@ image-slot {
   color: rgba(10, 10, 10, 0.45);
   line-height: 1.4;
 }
+.ordi-slot__image { object-fit: cover; }
 
