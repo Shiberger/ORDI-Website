@@ -8,6 +8,9 @@ type Props = {
   image?: StaticImageData | string
   alt?: string
   objectPosition?: string
+  sizes?: string
+  quality?: number
+  priority?: boolean
 }
 
 export function BottleSlot({
@@ -17,6 +20,9 @@ export function BottleSlot({
   image,
   alt,
   objectPosition,
+  sizes = '(max-width: 768px) 100vw, 600px',
+  quality,
+  priority,
 }: Props) {
   return (
     <div
@@ -31,7 +37,9 @@ export function BottleSlot({
           fill
           className="ordi-slot__image"
           style={objectPosition ? { objectPosition } : undefined}
-          sizes="(max-width: 768px) 100vw, 600px"
+          sizes={sizes}
+          quality={quality}
+          priority={priority}
         />
       ) : (
         <div className="ordi-slot__inner">

@@ -1547,23 +1547,84 @@ main {
 .ordi-jcard--list .ordi-jcard__title { font-size: 28px; }
 .ordi-jcard--list p { max-width: none; }
 
-.ordi-journal__archive { padding: var(--section-y-sm) 0 0; }
-.ordi-archive { list-style: none; padding: 0; margin: 0; }
-.ordi-archive li {
-  display: grid;
-  grid-template-columns: 100px 1fr 100px 30px;
+.ordi-journal__feature { transition: opacity 0.25s; }
+.ordi-journal__feature:hover { opacity: 0.78; }
+.ordi-jcard--list { transition: padding 0.25s, opacity 0.25s; }
+.ordi-jcard--list:hover { padding-left: 16px; opacity: 0.85; }
+
+/* ============================================================
+   JOURNAL POST DETAIL
+   ============================================================ */
+
+.ordi-jpost { display: flex; flex-direction: column; gap: 64px; padding-top: 24px; }
+.ordi-jpost__crumbs { display: flex; }
+.ordi-jpost__crumbs a { display: inline-flex; transition: opacity 0.2s; }
+.ordi-jpost__crumbs a:hover { opacity: 0.6; }
+
+.ordi-jpost__head {
+  display: flex;
+  flex-direction: column;
   gap: 32px;
+  max-width: 860px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 48px 0 56px;
+  text-align: center;
   align-items: center;
-  padding: 24px 0;
   border-bottom: 1px solid var(--ink-line);
-  font-size: 15px;
-  cursor: pointer;
-  transition: padding 0.25s;
 }
-.ordi-archive li:hover { padding-left: 16px; }
-.ordi-archive__t { font-family: var(--serif); font-size: 20px; letter-spacing: -0.01em; }
-.ordi-archive__d { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; color: var(--ink-soft); }
-.ordi-archive__arrow { color: var(--ink-softer); }
+.ordi-jpost__head h1 { margin: 0; letter-spacing: -0.015em; }
+
+.ordi-jpost__media {
+  aspect-ratio: 16/9;
+  background: var(--paper-2);
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.ordi-jpost__body {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 16px 0 32px;
+}
+.ordi-jpost__body p {
+  font-family: var(--serif);
+  font-size: 21px;
+  line-height: 1.7;
+  color: var(--ink);
+  margin: 0;
+}
+.ordi-jpost__body:first-of-type p:first-child::first-letter {
+  font-family: var(--display, var(--serif));
+  font-size: 3.4em;
+  line-height: 0.9;
+  float: left;
+  padding: 6px 12px 0 0;
+  font-weight: 500;
+}
+
+.ordi-jpost__related {
+  padding-top: 56px;
+  border-top: 1px solid var(--ink);
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+.ordi-jpost__related-list { display: grid; grid-template-columns: 1fr; gap: 0; }
+
+@media (max-width: 768px) {
+  .ordi-jpost { gap: 40px; padding-top: 8px; }
+  .ordi-jpost__head { padding: 24px 0 40px; gap: 20px; }
+  .ordi-jpost__body { gap: 22px; }
+  .ordi-jpost__body p { font-size: 18px; line-height: 1.65; }
+  .ordi-jpost__body:first-of-type p:first-child::first-letter { font-size: 3em; padding: 4px 8px 0 0; }
+  .ordi-jpost__related { padding-top: 32px; gap: 20px; }
+}
 
 /* ============================================================
    ACCOUNT

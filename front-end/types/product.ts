@@ -30,9 +30,12 @@ export type Product = {
 
 export type JournalEntry = {
   id: string
+  slug: string
   number: string
   date: string
   title: Bilingual
   excerpt: Bilingual
+  body: Bilingual
+  body2?: Bilingual
   readtime: string
 }

@@ -154,6 +154,8 @@ export default function AboutPage() {
             placeholder="Studio interior — bench, beakers, light"
             image={StudioLocation}
             alt="ORDI studio — Sukhumvit, Bangkok"
+            sizes="(max-width: 768px) 100vw, 640px"
+            quality={85}
           />
         </div>
         <div className="ordi-about__intro-copy">
@@ -228,7 +230,13 @@ export default function AboutPage() {
             className={`ordi-about__founders ordi-about__founders--${i % 2 === 0 ? 'left' : 'right'}`}
           >
             <div className="ordi-about__founders-media">
-              <BottleSlot placeholder={c.portrait} image={c.image} alt={`${c.nickname} — ${c.name}`} />
+              <BottleSlot
+                placeholder={c.portrait}
+                image={c.image}
+                alt={`${c.nickname} — ${c.name}`}
+                sizes="(max-width: 768px) 100vw, 640px"
+                quality={85}
+              />
             </div>
             <div className="ordi-about__founders-copy">
               <MonoTag>
@@ -259,6 +267,8 @@ export default function AboutPage() {
               placeholder="DA — perfume consultant, casual editorial portrait"
               image={SakdaPortrait}
               alt="DA — Sakda Promsorn"
+              sizes="(max-width: 768px) 100vw, 640px"
+              quality={85}
             />
           </div>
           <div className="ordi-about__founders-copy">
