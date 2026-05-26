@@ -7,7 +7,7 @@ import { useApp } from '@/lib/context/AppContext'
 import { cn } from '@/lib/utils'
 
 export function Nav() {
-  const { cartCount, setDrawerOpen, t } = useApp()
+  const { cartCount, setDrawerOpen, setMenuOpen, t } = useApp()
   const pathname = usePathname()
   const [scrolled, setScrolled] = useState(false)
 
@@ -29,6 +29,16 @@ export function Nav() {
     <header className={cn('ordi-nav', scrolled && 'ordi-nav--scrolled')}>
       <div className="ordi-nav__inner">
         <div className="ordi-nav__left">
+          <button
+            type="button"
+            className="ordi-nav__burger"
+            aria-label="Open menu"
+            aria-expanded={false}
+            onClick={() => setMenuOpen(true)}
+          >
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
+          </button>
           <Link href="/" className="ordi-nav__brand">
             <span className="ordi-nav__brand-mark ordi-wordmark">
               <span className="ordi-wordmark__o">O</span>RDI

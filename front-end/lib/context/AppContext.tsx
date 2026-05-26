@@ -32,6 +32,9 @@ type AppContextValue = {
   drawerOpen: boolean
   setDrawerOpen: (open: boolean) => void
 
+  menuOpen: boolean
+  setMenuOpen: (open: boolean) => void
+
   lang: Lang
   setLang: (lang: Lang) => void
   t: UIStrings
@@ -62,6 +65,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([])
   const [wishlist, setWishlist] = useState<string[]>([])
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   const [lang, setLangState] = useState<Lang>('en')
   const [hydrated, setHydrated] = useState(false)
 
@@ -152,6 +156,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     toggleWishlist,
     drawerOpen,
     setDrawerOpen,
+    menuOpen,
+    setMenuOpen,
     lang,
     setLang,
     t,

@@ -4,6 +4,7 @@ import { AppProvider } from '@/lib/context/AppContext'
 import { Nav } from '@/components/layout/Nav'
 import { Footer } from '@/components/layout/Footer'
 import { CartDrawer } from '@/components/layout/CartDrawer'
+import { MobileMenu } from '@/components/layout/MobileMenu'
 import './globals.css'
 
 const geistMono = Geist_Mono({
@@ -39,7 +40,9 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  width: 1280,
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -58,6 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
           <Footer />
           <CartDrawer />
+          <MobileMenu />
         </AppProvider>
       </body>
     </html>
