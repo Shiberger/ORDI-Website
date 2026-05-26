@@ -1858,6 +1858,99 @@ main {
 }
 
 /* ============================================================
+   CONTACT
+   ============================================================ */
+
+.ordi-contact { padding: 0 var(--gutter-x); max-width: var(--container); margin: 0 auto; }
+.ordi-contact__hero {
+  padding: 80px 0 var(--section-y-sm);
+  border-bottom: 1px solid var(--ink);
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  align-items: flex-start;
+}
+.ordi-contact__hero h1 { display: flex; flex-direction: column; }
+.ordi-contact__hero h1 span { display: block; }
+.ordi-contact__lede {
+  font-family: var(--serif);
+  font-size: 22px;
+  line-height: 1.4;
+  max-width: 720px;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+.ordi-contact__channels { padding: var(--section-y-sm) 0; }
+.ordi-contact__grid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+.ordi-contact__card {
+  border: 1px solid var(--ink);
+  padding: 40px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  background: var(--paper);
+  transition: background 0.2s ease;
+}
+.ordi-contact__card:hover { background: var(--paper-2); }
+.ordi-contact__card h3 { margin: 0; }
+.ordi-contact__handle {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  margin: 0;
+  word-break: break-all;
+}
+.ordi-contact__desc {
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 0;
+  flex: 1;
+}
+.ordi-contact__card .ordi-btn { margin-top: 8px; }
+
+.ordi-contact__studio {
+  padding: var(--section-y-sm) 0 var(--section-y-sm);
+  border-top: 1px solid var(--ink);
+}
+.ordi-contact__studio-copy { display: flex; flex-direction: column; gap: 20px; max-width: 720px; }
+.ordi-contact__studio-copy h2 { margin: 0; }
+.ordi-contact__studio-copy p {
+  font-family: var(--serif);
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  margin: 0;
+}
+.ordi-contact__meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin: 16px 0 0;
+  padding-top: 24px;
+  border-top: 1px solid var(--ink-line);
+}
+.ordi-contact__meta dt {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin: 0 0 6px;
+}
+.ordi-contact__meta dd { margin: 0; font-size: 14px; line-height: 1.5; }
+.ordi-contact__meta a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+
+/* ============================================================
    IMAGE SLOT defaults
    ============================================================ */
 
@@ -1896,6 +1989,8 @@ image-slot {
   .ordi-pyramid__grid, .ordi-process, .ordi-journal__grid--home { grid-template-columns: 1fr 1fr; }
   .ordi-shop__gallery { grid-template-columns: repeat(3, 1fr); }
   .ordi-checkout__grid, .ordi-cartpage__grid { grid-template-columns: 1fr; }
+  .ordi-contact__grid { grid-template-columns: 1fr; }
+  .ordi-contact__meta { grid-template-columns: 1fr; }
 }
 
 /* ============================================================

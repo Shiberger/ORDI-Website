@@ -14,7 +14,7 @@ import type { Product } from '@/types/product'
 type Props = { product: Product }
 
 export function ProductDetail({ product: p }: Props) {
-  const { t, lang, addToCart, wishlist, toggleWishlist } = useApp()
+  const { t, lang, wishlist, toggleWishlist } = useApp()
   const [size, setSize] = useState(p.sizes[0].ml)
   const [hoverNote, setHoverNote] = useState<string | null>(null)
   const selectedSize = p.sizes.find((s) => s.ml === size) ?? p.sizes[0]
@@ -87,14 +87,23 @@ export function ProductDetail({ product: p }: Props) {
           </div>
 
           <div className="ordi-product__actions">
-            <button
-              className="ordi-btn ordi-btn--primary ordi-btn--lg"
-              onClick={() => !isSoon && addToCart(p.id, size)}
-              disabled={isSoon}
-            >
-              {isSoon ? t.cta.sold_out : t.cta.add_to_cart} —{' '}
-              {formatPrice(selectedSize.price)} {t.currency}
-            </button>
+            {isSoon ? (
+              <button
+                className="ordi-btn ordi-btn--primary ordi-btn--lg"
+                disabled
+              >
+                {t.cta.sold_out} — {formatPrice(selectedSize.price)} {t.currency}
+              </button>
+            ) : (
+              <a
+                className="ordi-btn ordi-btn--primary ordi-btn--lg"
+                href="https://shopee.co.th/ordi.bkk#product_list"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t.cta.shop_online} — {formatPrice(selectedSize.price)} {t.currency}
+              </a>
+            )}
             <button
               className={cn('ordi-btn ordi-btn--icon', saved && 'is-saved')}
               onClick={() => toggleWishlist(p.id)}

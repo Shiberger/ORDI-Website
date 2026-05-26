@@ -26,15 +26,17 @@ export function Footer() {
             <div className="ordi-footer__h">Company</div>
             <Link href="/about">About</Link>
             <Link href="/journal">Journal</Link>
-            <Link href="/membership">Membership</Link>
-            <a>Contact</a>
+            <Link href="/contact">Contact</Link>
           </div>
           <div className="ordi-footer__col">
             <div className="ordi-footer__h">Care</div>
-            <a>Shipping</a>
-            <a>Returns</a>
-            <a>How to wear</a>
-            <a>FAQ</a>
+            <a
+              href="https://shopee.co.th/ordi.bkk#product_list"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Shipping
+            </a>
           </div>
           <div className="ordi-footer__col">
             <div className="ordi-footer__h">Newsletter</div>
