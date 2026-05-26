@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { products } from '@/lib/data/products'
+import { getProductImage } from '@/lib/data/product-images'
 import { useApp } from '@/lib/context/AppContext'
 import { MonoTag } from '@/components/ui/MonoTag'
 import { SectionHead } from '@/components/ui/SectionHead'
@@ -32,7 +33,13 @@ export function ProductDetail({ product: p }: Props) {
 
       <section className="ordi-product__top">
         <div className="ordi-product__media" style={{ background: p.hue }}>
-          <BottleSlot placeholder={`${p.name} — large editorial bottle shot`} />
+          <BottleSlot
+            image={getProductImage(p.id)}
+            placeholder={`${p.name} — large editorial bottle shot`}
+            alt={`${p.name} ${p.number} — editorial bottle shot`}
+            sizes="(max-width: 768px) 100vw, 50vw"
+            priority
+          />
           <div className={cn('ordi-product__media-num', dark && 'is-dark')}>
             {p.number}
           </div>
@@ -202,7 +209,12 @@ export function ProductDetail({ product: p }: Props) {
           {others.map((o) => (
             <Link className="ordi-pcard" key={o.id} href={`/shop/${o.id}`}>
               <div className="ordi-pcard__media" style={{ background: o.hue }}>
-                <BottleSlot placeholder={o.name} />
+                <BottleSlot
+                  image={getProductImage(o.id)}
+                  placeholder={o.name}
+                  alt={`${o.name} ${o.number}`}
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                />
                 <div className="ordi-pcard__num">{o.number}</div>
               </div>
               <div className="ordi-pcard__meta">

@@ -3,17 +3,20 @@
 import Link from 'next/link'
 import { useApp } from '@/lib/context/AppContext'
 import { products } from '@/lib/data/products'
+import { getProductImage } from '@/lib/data/product-images'
 import { journal } from '@/lib/data/journal'
 import { MonoTag } from '@/components/ui/MonoTag'
 import { SectionHead } from '@/components/ui/SectionHead'
 import { Marquee } from '@/components/ui/Marquee'
 import { BottleSlot } from '@/components/ui/BottleSlot'
 import { formatPrice, isDarkHue } from '@/lib/utils'
+import PhiwfonHero from '@/assets/journal/phiwfon_feature_article.png'
 
 export default function HomePage() {
   const { t, lang } = useApp()
   const featured = products.slice(0, 4)
   const skin = products.find((p) => p.id === 'skin-scent')
+  const phiwfon = journal.find((j) => j.slug === 'phiwfon-scent-of-air')
 
   return (
     <main className="ordi-home">
@@ -21,7 +24,7 @@ export default function HomePage() {
       <section className="ordi-hero">
         <div className="ordi-hero__poster">
           <div className="ordi-hero__meta">
-            <MonoTag>EST. BANGKOK / 2024</MonoTag>
+            <MonoTag>EST. BANGKOK / 2025</MonoTag>
             <MonoTag>
               VOL. 05 ·{' '}
               {new Date()
@@ -41,8 +44,8 @@ export default function HomePage() {
           <div className="ordi-hero__bottom">
             <p className="ordi-hero__lede">
               {lang === 'en'
-                ? "Five fragrances. One small studio in Bangkok. Perfume for people who don't want to smell like everyone else — and aren't quite sure what they do want to smell like."
-                : 'ห้ากลิ่น สตูดิโอเล็กๆ ในกรุงเทพ น้ำหอมสำหรับคนที่ไม่อยากมีกลิ่นเหมือนใคร — และยังไม่แน่ใจว่าตัวเองอยากมีกลิ่นแบบไหน'}
+                ? "Fragrances. One small studio in Bangkok. Perfume for people who don't want to smell like everyone else and aren't quite sure what they do want to smell like."
+                : 'สตูดิโอเล็กๆ ในกรุงเทพ น้ำหอมสำหรับคนที่ไม่อยากมีกลิ่นเหมือนใคร และยังไม่แน่ใจว่าตัวเองอยากมีกลิ่นแบบไหน'}
             </p>
             <div className="ordi-hero__cta">
               <Link href="/shop" className="ordi-btn ordi-btn--primary">
@@ -63,11 +66,11 @@ export default function HomePage() {
 
       <Marquee
         items={[
-          'FIVE FRAGRANCES',
+          'FRAGRANCES',
           'MADE BY HAND IN BANGKOK',
           'NICHE PERFUMERY',
-          'EAU DE PARFUM 18%',
-          'VEGAN · CRUELTY-FREE',
+          'EAU DE PARFUM',
+          'CRUELTY-FREE',
           'OUT OF ORDINARY ONLY OUS',
         ]}
         speed={45}
@@ -79,7 +82,7 @@ export default function HomePage() {
           kicker="↘ THE COLLECTION · N°01—N°05"
           title={
             <span>
-              Five fragrances,
+              Fragrances,
               <br />
               one for each <em>version</em>
               <br />
@@ -91,7 +94,7 @@ export default function HomePage() {
               <p>
                 {lang === 'en'
                   ? 'Each scent is composed and macerated in our Sukhumvit studio. Aged sixty days. Bottled in fifty milliliters or twelve.'
-                  : 'ทุกกลิ่นถูกประพันธ์และหมักในสตูดิโอย่านสุขุมวิทของเรา บ่มหกสิบวัน บรรจุในขนาดห้าสิบหรือสิบสองมิลลิลิตร'}
+                  : 'ทุกกลิ่นถูกวางองค์ประกอบและการบ่มในสตูดิโอย่านสุขุมวิทของเรา บ่มหกสิบวัน บรรจุในขนาดห้าสิบหรือสิบสองมิลลิลิตร'}
               </p>
               <Link href="/shop" className="ordi-btn ordi-btn--ghost">
                 {t.cta.shop_all} →
@@ -104,7 +107,10 @@ export default function HomePage() {
             <Link className="ordi-pcard" key={p.id} href={`/shop/${p.id}`}>
               <div className="ordi-pcard__media" style={{ background: p.hue }}>
                 <BottleSlot
+                  image={getProductImage(p.id)}
                   placeholder={`${p.name} — bottle on ${isDarkHue(p.hue) ? 'dark' : 'neutral'} backdrop`}
+                  alt={`${p.name} ${p.number} — eau de parfum`}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                 />
                 <div className="ordi-pcard__num">{p.number}</div>
               </div>
@@ -129,23 +135,35 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SKIN SCENT TEASE */}
+      {/* PHIWFON — N°05 TEASE */}
       {skin && (
         <section className="ordi-skinscent">
           <div className="ordi-skinscent__grid">
             <div className="ordi-skinscent__media">
-              <BottleSlot placeholder="SKIN SCENT — moody close-up of skin / fabric" />
+              <BottleSlot
+                image={PhiwfonHero}
+                placeholder="PHIWFON — moody close-up of skin / fabric"
+                alt={
+                  lang === 'en'
+                    ? "Phiwfon — the scent of air that hasn't dried yet"
+                    : 'ผิวฝน กลิ่นของอากาศที่ยังไม่แห้ง'
+                }
+                sizes="(max-width: 768px) 100vw, 680px"
+                quality={92}
+              />
               <div className="ordi-skinscent__chip">{t.coming_soon.toUpperCase()}</div>
             </div>
             <div className="ordi-skinscent__copy">
               <MonoTag>N°05 · NEW COLLECTION</MonoTag>
               <h2 className="ordi-display-lg">
-                Skin <em>Scent.</em>
+                <em>{lang === 'en' ? 'Phiwfon' : 'ผิวฝน'}</em>.
               </h2>
               <p>
-                {lang === 'en'
-                  ? "A perfume that doesn't arrive. It is already there. The fifth in our collection — designed to live underneath, almost beneath, the people who get close enough."
-                  : 'น้ำหอมที่ไม่ได้มาถึง มันอยู่ที่นั่นแล้ว กลิ่นที่ห้าในคอลเลกชั่น — ออกแบบมาให้อยู่ใต้ผิว เกือบใต้ ของคนที่เข้ามาใกล้พอ'}
+                {phiwfon
+                  ? phiwfon.excerpt[lang]
+                  : lang === 'en'
+                  ? "A perfume that doesn't arrive. It is already there."
+                  : 'น้ำหอมที่ไม่ได้มาถึง มันอยู่ที่นั่นแล้ว'}
               </p>
               <div className="ordi-skinscent__notes">
                 <div>
@@ -179,26 +197,26 @@ export default function HomePage() {
           <blockquote>
             <p>
               {lang === 'en'
-                ? "“Bangkok's most quietly confident new perfume house.”"
-                : '“บ้านน้ำหอมหน้าใหม่ของกรุงเทพที่มั่นใจอย่างเงียบๆ ที่สุด”'}
+                ? "“The 'Frédéric Malle' of the Thai fragrance scene. True artistic creations at an incredibly accessible price.”"
+                : '“ขอแต่งตั้งให้เป็น "Frédéric Malle แห่งวงการน้ำหอมไทย" นี่คือน้ำหอมที่เป็นชิ้นงานศิลปะ (Art piece) ในราคาหลักร้อย”'}
             </p>
-            <cite>— A SMALL MAGAZINE</cite>
+            <cite>— Mike Scents</cite>
           </blockquote>
           <blockquote>
             <p>
               {lang === 'en'
-                ? "“The kind of fragrance you keep on the nightstand and won't tell anyone the name of.”"
-                : '“น้ำหอมที่เก็บไว้ที่หัวเตียงและไม่บอกใครว่ามันชื่ออะไร”'}
+                ? "“Wowed by every single scent. ORDI's creations are so sophisticated and intriguing a must-try.”"
+                : '“ว้าวตั้งแต่กลิ่นแรกจนกลิ่นสุดท้าย ORDI ทำน้ำหอมออกมาได้มีชั้นเชิงและน่าค้นหามากครับ”'}
             </p>
-            <cite>— W. C., LOYAL CUSTOMER</cite>
+            <cite>— Scented Story</cite>
           </blockquote>
           <blockquote>
             <p>
               {lang === 'en'
-                ? '“GOOD BOY ruined every other clean fragrance for me. Sorry to all of them.”'
-                : '“GOOD BOY ทำให้กลิ่นสะอาดอื่นๆ ใช้ไม่ได้แล้ว ขอโทษทุกขวด”'}
+                ? '“A quality Thai brand for everyday use. Its unique scents are polite, elegant, yet deeply captivating.”'
+                : '“แบรนด์ไทยคุณภาพ ใช้ทุกวันตัวกลิ่นหลายกลิ่นมีเอกลักษณ์แถมยังสุภาพแต่มีเสน่ห์มาก ๆ”'}
             </p>
-            <cite>— TIKTOK COMMENT, ★★★★★</cite>
+            <cite>— Kannapas Phumiphatsiriyakorn</cite>
           </blockquote>
         </div>
       </section>
