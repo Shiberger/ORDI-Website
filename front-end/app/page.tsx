@@ -15,7 +15,7 @@ import PhiwfonHero from '@/assets/journal/phiwfon_feature_article.png'
 export default function HomePage() {
   const { t, lang } = useApp()
   const featured = products.slice(0, 4)
-  const skin = products.find((p) => p.id === 'skin-scent')
+  const skin = products.find((p) => p.id === 'phiwfon')
   const phiwfon = journal.find((j) => j.slug === 'phiwfon-scent-of-air')
 
   return (
@@ -180,7 +180,7 @@ export default function HomePage() {
                 </div>
               </div>
               <Link
-                href={`/shop/${skin.id}`}
+                href="/journal/phiwfon-scent-of-air"
                 className="ordi-btn ordi-btn--primary"
               >
                 {t.cta.sold_out} →
@@ -238,7 +238,7 @@ export default function HomePage() {
         />
         <div className="ordi-journal__grid ordi-journal__grid--home">
           {journal.slice(0, 3).map((j) => (
-            <Link className="ordi-jcard" key={j.id} href="/journal">
+            <Link className="ordi-jcard" key={j.id} href={`/journal/${j.slug}`}>
               <div className="ordi-jcard__meta">
                 <MonoTag>{j.number}</MonoTag>
                 <span>{j.date}</span>

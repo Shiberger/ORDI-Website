@@ -56,46 +56,62 @@ export default function ShopPage() {
         <tbody>
           {products
             .filter((p) => filter === 'all' || p.status === filter)
-            .map((p) => (
-              <tr
-                key={p.id}
-                className={cn(
-                  'ordi-shop__row',
-                  p.status === 'coming-soon' && 'is-soon',
-                  hover === p.id && 'is-hover'
-                )}
-                onMouseEnter={() => setHover(p.id)}
-                onMouseLeave={() => setHover(null)}
-              >
-                <td className="ordi-shop__cell-num">
-                  <Link href={`/shop/${p.id}`}>{p.number}</Link>
-                </td>
-                <td>
-                  <Link href={`/shop/${p.id}`}>
-                    <div className="ordi-shop__name">{p.name}</div>
-                    <div className="ordi-shop__taglinerow">
-                      <em>{p.tagline[lang]}</em>
-                    </div>
-                  </Link>
-                </td>
-                <td className="ordi-shop__family">{p.family[lang]}</td>
-                <td className="ordi-shop__notes">{p.notes.heart.join(' · ')}</td>
-                <td className="ordi-shop__price">
-                  {formatPrice(p.sizes[1].price)} {t.currency}
-                </td>
-                <td className="ordi-shop__cta">
-                  <Link href={`/shop/${p.id}`}>
-                    {p.status === 'coming-soon' ? (
-                      <span className="ordi-mono-tag">
-                        {t.coming_soon.toUpperCase()} →
+            .map((p) => {
+              const isSoon = p.status === 'coming-soon'
+              return (
+                <tr
+                  key={p.id}
+                  className={cn(
+                    'ordi-shop__row',
+                    isSoon && 'is-soon',
+                    hover === p.id && 'is-hover'
+                  )}
+                  onMouseEnter={() => setHover(p.id)}
+                  onMouseLeave={() => setHover(null)}
+                >
+                  <td className="ordi-shop__cell-num">
+                    {isSoon ? (
+                      <span>{p.number}</span>
+                    ) : (
+                      <Link href={`/shop/${p.id}`}>{p.number}</Link>
+                    )}
+                  </td>
+                  <td>
+                    {isSoon ? (
+                      <span>
+                        <div className="ordi-shop__name">{p.name}</div>
+                        <div className="ordi-shop__taglinerow">
+                          <em>{p.tagline[lang]}</em>
+                        </div>
                       </span>
                     ) : (
-                      <span className="ordi-mono-tag">VIEW →</span>
+                      <Link href={`/shop/${p.id}`}>
+                        <div className="ordi-shop__name">{p.name}</div>
+                        <div className="ordi-shop__taglinerow">
+                          <em>{p.tagline[lang]}</em>
+                        </div>
+                      </Link>
                     )}
-                  </Link>
-                </td>
-              </tr>
-            ))}
+                  </td>
+                  <td className="ordi-shop__family">{p.family[lang]}</td>
+                  <td className="ordi-shop__notes">{p.notes.heart.join(' · ')}</td>
+                  <td className="ordi-shop__price">
+                    {formatPrice(p.sizes[1].price)} {t.currency}
+                  </td>
+                  <td className="ordi-shop__cta">
+                    {isSoon ? (
+                      <span className="ordi-mono-tag">
+                        {t.coming_soon.toUpperCase()}
+                      </span>
+                    ) : (
+                      <Link href={`/shop/${p.id}`}>
+                        <span className="ordi-mono-tag">VIEW →</span>
+                      </Link>
+                    )}
+                  </td>
+                </tr>
+              )
+            })}
         </tbody>
       </table>
     </main>
