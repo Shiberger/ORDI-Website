@@ -113,9 +113,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setWishlist((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
   }, [])
 
-  const setLang = useCallback((next: Lang) => {
-    setLangState(next)
-  }, [])
+  const setLang = useCallback(
+    (next: Lang) => {
+      if (next === lang) return
+      writeStorage(LANG_KEY, next)
+      if (typeof window !== 'undefined') {
+        window.location.assign('/')
+        return
+      }
+      setLangState(next)
+    },
+    [lang]
+  )
 
   const cartCount = useMemo(() => cart.reduce((n, it) => n + it.qty, 0), [cart])
 
