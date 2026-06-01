@@ -514,45 +514,25 @@ main {
   animation-delay: 0.66s;
 }
 
-.ordi-hero__line {
+/* Hero entrance is driven by GSAP (SplitText char-level cascade). CSS only
+   sets the initial hidden state, gated by .motion-ready so JS-disabled users
+   still see content. */
+.motion-ready .ordi-hero__line,
+.motion-ready .ordi-hero__meta,
+.motion-ready .ordi-hero__bottom,
+.motion-ready .ordi-hero__foot {
   opacity: 0;
-  transform: translate3d(var(--reveal-from-x, 0), var(--reveal-from-y, 0.25em), 0);
-  clip-path: inset(0 0 100% 0);
-  -webkit-clip-path: inset(0 0 100% 0);
-  animation: ordiHeroLineReveal 1.15s cubic-bezier(0.2, 0.7, 0.15, 1) forwards;
-  will-change: transform, opacity, clip-path;
+}
+.motion-ready .ordi-hero__line {
+  will-change: transform, opacity;
 }
 
-@keyframes ordiHeroLineReveal {
-  0% {
-    opacity: 0;
-    transform: translate3d(var(--reveal-from-x, 0), var(--reveal-from-y, 0.25em), 0);
-    clip-path: inset(0 0 100% 0);
-    -webkit-clip-path: inset(0 0 100% 0);
-  }
-  60% { opacity: 1; }
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-    clip-path: inset(-0.1em 0 -0.1em 0);
-    -webkit-clip-path: inset(-0.1em 0 -0.1em 0);
-  }
-}
-
-/* Meta bar, lede/CTAs, and foot fade in around the title */
-.ordi-hero__meta,
-.ordi-hero__bottom,
-.ordi-hero__foot {
+/* Site-wide scroll reveal. Any element with [data-reveal] starts faded and
+   shifted down; ScrollTrigger.batch in SmoothScroll animates it into place. */
+.motion-ready [data-reveal] {
   opacity: 0;
-  animation: ordiHeroFadeIn 0.85s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
-}
-.ordi-hero__meta   { animation-delay: 0.05s; }
-.ordi-hero__bottom { animation-delay: 1.05s; }
-.ordi-hero__foot   { animation-delay: 1.25s; }
-
-@keyframes ordiHeroFadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+  transform: translate3d(0, 28px, 0);
+  will-change: opacity, transform;
 }
 
 /* Halftone texture, if present, fades in last so the type lands first */
@@ -566,17 +546,16 @@ main {
   to { opacity: 0.95; }
 }
 
-/* Respect reduced motion */
+/* Respect reduced motion — force-visible final state so nothing stays hidden
+   if the user has asked for less motion. */
 @media (prefers-reduced-motion: reduce) {
-  .ordi-hero__line,
-  .ordi-hero__meta,
-  .ordi-hero__bottom,
-  .ordi-hero__foot {
+  .motion-ready .ordi-hero__line,
+  .motion-ready .ordi-hero__meta,
+  .motion-ready .ordi-hero__bottom,
+  .motion-ready .ordi-hero__foot,
+  .motion-ready [data-reveal] {
     opacity: 1;
     transform: none;
-    clip-path: none;
-    -webkit-clip-path: none;
-    animation: none;
   }
   [data-texture="subtle"] .ordi-hero::before,
   [data-texture="poster"] .ordi-hero::before,

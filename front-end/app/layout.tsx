@@ -5,6 +5,7 @@ import { Nav } from '@/components/layout/Nav'
 import { Footer } from '@/components/layout/Footer'
 import { CartDrawer } from '@/components/layout/CartDrawer'
 import { MobileMenu } from '@/components/layout/MobileMenu'
+import { SmoothScroll } from '@/components/layout/SmoothScroll'
 import './globals.css'
 
 const geistMono = Geist_Mono({
@@ -58,8 +59,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <AppProvider>
           <Nav />
-          {children}
-          <Footer />
+          <SmoothScroll>
+            {children}
+            <Footer />
+          </SmoothScroll>
           <CartDrawer />
           <MobileMenu />
         </AppProvider>

@@ -1,6 +1,10 @@
 'use client'
 
 import Link from 'next/link'
+import { useRef } from 'react'
+import gsap from 'gsap'
+import { SplitText } from 'gsap/SplitText'
+import { useGSAP } from '@gsap/react'
 import { useApp } from '@/lib/context/AppContext'
 import { products } from '@/lib/data/products'
 import { getProductImage } from '@/lib/data/product-images'
@@ -12,14 +16,53 @@ import { BottleSlot } from '@/components/ui/BottleSlot'
 import { formatPrice, isDarkHue } from '@/lib/utils'
 import PhiwfonHero from '@/assets/journal/phiwfon_feature_article.png'
 
+gsap.registerPlugin(SplitText)
+
 export default function HomePage() {
   const { t, lang } = useApp()
   const featured = products.slice(0, 4)
   const skin = products.find((p) => p.id === 'phiwfon')
   const phiwfon = journal.find((j) => j.slug === 'phiwfon-scent-of-air')
+  const mainRef = useRef<HTMLElement>(null)
+
+  useGSAP(
+    () => {
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      if (reduced) {
+        gsap.set(
+          '.ordi-hero__line, .ordi-hero__meta, .ordi-hero__bottom, .ordi-hero__foot',
+          { opacity: 1, y: 0 },
+        )
+        return
+      }
+
+      const lines = gsap.utils.toArray<HTMLElement>('.ordi-hero__line')
+      const splits = lines.map((line) => SplitText.create(line, { type: 'chars,words' }))
+
+      const tl = gsap.timeline()
+      tl.to('.ordi-hero__meta', { opacity: 1, duration: 0.4 }, 0)
+
+      splits.forEach((split, i) => {
+        gsap.set(lines[i], { opacity: 1 })
+        tl.from(
+          split.chars,
+          { opacity: 0, y: 14, duration: 0.55, stagger: 0.012 },
+          0.1 + i * 0.18,
+        )
+      })
+
+      tl.to('.ordi-hero__bottom', { opacity: 1, duration: 0.5 }, 0.75)
+      tl.to('.ordi-hero__foot', { opacity: 1, duration: 0.5 }, 0.9)
+
+      return () => {
+        splits.forEach((s) => s.revert())
+      }
+    },
+    { scope: mainRef },
+  )
 
   return (
-    <main className="ordi-home">
+    <main className="ordi-home" ref={mainRef}>
       {/* HERO */}
       <section className="ordi-hero">
         <div className="ordi-hero__poster">
@@ -77,7 +120,7 @@ export default function HomePage() {
       />
 
       {/* COLLECTION GRID */}
-      <section className="ordi-section ordi-collection">
+      <section className="ordi-section ordi-collection" data-reveal>
         <SectionHead
           kicker="↘ THE COLLECTION · N°01—N°05"
           title={
@@ -137,7 +180,7 @@ export default function HomePage() {
 
       {/* PHIWFON — N°05 TEASE */}
       {skin && (
-        <section className="ordi-skinscent">
+        <section className="ordi-skinscent" data-reveal>
           <div className="ordi-skinscent__grid">
             <div className="ordi-skinscent__media">
               <BottleSlot
@@ -191,7 +234,7 @@ export default function HomePage() {
       )}
 
       {/* PRESS QUOTES */}
-      <section className="ordi-press">
+      <section className="ordi-press" data-reveal>
         <MonoTag>NOTES ABOUT US</MonoTag>
         <div className="ordi-press__grid">
           <blockquote>
@@ -222,7 +265,7 @@ export default function HomePage() {
       </section>
 
       {/* JOURNAL TEASE */}
-      <section className="ordi-section">
+      <section className="ordi-section" data-reveal>
         <SectionHead
           kicker="↘ JOURNAL"
           title={
