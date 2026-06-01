@@ -1102,7 +1102,7 @@ main {
 .ordi-shop__row.is-soon:hover { opacity: 0.85; }
 
 .ordi-shop__gallery {
-  display: grid;
+  display: none; /* card list is a mobile-only alternative to the table */
   grid-template-columns: repeat(5, 1fr);
   gap: 16px;
   margin-top: 64px;
@@ -2214,6 +2214,7 @@ image-slot {
   /* ---------- Shop: swap the table for the gallery card list ---------- */
   .ordi-shop__table { display: none; }
   .ordi-shop__gallery {
+    display: grid;
     grid-template-columns: 1fr;
     gap: 24px;
     margin-top: 8px;

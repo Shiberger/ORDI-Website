@@ -3,9 +3,11 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { products } from '@/lib/data/products'
+import { getProductImage } from '@/lib/data/product-images'
 import { useApp } from '@/lib/context/AppContext'
 import { MonoTag } from '@/components/ui/MonoTag'
-import { cn, formatPrice } from '@/lib/utils'
+import { BottleSlot } from '@/components/ui/BottleSlot'
+import { cn, formatPrice, isDarkHue } from '@/lib/utils'
 
 type Filter = 'all' | 'available' | 'coming-soon'
 
@@ -13,6 +15,8 @@ export default function ShopPage() {
   const { t, lang } = useApp()
   const [filter, setFilter] = useState<Filter>('all')
   const [hover, setHover] = useState<string | null>(null)
+
+  const visible = products.filter((p) => filter === 'all' || p.status === filter)
 
   return (
     <main className="ordi-shop">
@@ -54,9 +58,7 @@ export default function ShopPage() {
           </tr>
         </thead>
         <tbody>
-          {products
-            .filter((p) => filter === 'all' || p.status === filter)
-            .map((p) => {
+          {visible.map((p) => {
               const isSoon = p.status === 'coming-soon'
               return (
                 <tr
@@ -114,6 +116,45 @@ export default function ShopPage() {
             })}
         </tbody>
       </table>
+
+      {/* Mobile card list — the table is hidden on small screens (see globals.css),
+          so this gallery carries the collection on phones. */}
+      <div className="ordi-shop__gallery">
+        {visible.map((p) => {
+          const isSoon = p.status === 'coming-soon'
+          const card = (
+            <>
+              <div className="ordi-galcard__media" style={{ background: p.hue }}>
+                <BottleSlot
+                  image={getProductImage(p.id)}
+                  placeholder={`${p.name} — bottle on ${isDarkHue(p.hue) ? 'dark' : 'neutral'} backdrop`}
+                  alt={`${p.name} ${p.number} — eau de parfum`}
+                  sizes="100vw"
+                />
+                {isSoon && (
+                  <span className="ordi-galcard__soon">{t.coming_soon.toUpperCase()}</span>
+                )}
+              </div>
+              <div className="ordi-galcard__meta">
+                <span className="ordi-galcard__name">{p.name}</span>
+                <span>
+                  {formatPrice(p.sizes[1].price)} {t.currency}
+                </span>
+              </div>
+            </>
+          )
+
+          return isSoon ? (
+            <div className="ordi-galcard" key={p.id}>
+              {card}
+            </div>
+          ) : (
+            <Link className="ordi-galcard" key={p.id} href={`/shop/${p.id}`}>
+              {card}
+            </Link>
+          )
+        })}
+      </div>
     </main>
   )
 }
