@@ -60,6 +60,13 @@ export function SmoothScroll({ children }: Props) {
   // sections keep the initial opacity:0 CSS and never animate in.
   useGSAP(
     () => {
+      // Land each new page at the top. Next.js resets window scroll on
+      // navigation, but ScrollSmoother runs its own virtual scroll and swallows
+      // that — so without this the previous scroll offset carries over and, on
+      // a shorter page, clamps to the bottom. No-op on touch/reduced-motion
+      // where the smoother is absent and native scroll restoration applies.
+      ScrollSmoother.get()?.scrollTo(0, false)
+
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
       if (reduced) {
         gsap.set('[data-reveal]', { opacity: 1, y: 0, clearProps: 'transform' })
