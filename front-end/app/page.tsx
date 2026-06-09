@@ -14,15 +14,16 @@ import { SectionHead } from '@/components/ui/SectionHead'
 import { Marquee } from '@/components/ui/Marquee'
 import { BottleSlot } from '@/components/ui/BottleSlot'
 import { formatPrice, isDarkHue } from '@/lib/utils'
-import PhiwfonHero from '@/assets/journal/phiwfon_feature_article.png'
+import CloudFonHero from '@/assets/journal/cloud-fon_feature_article.png'
+
 
 gsap.registerPlugin(SplitText)
 
 export default function HomePage() {
   const { t, lang } = useApp()
   const featured = products.slice(0, 4)
-  const skin = products.find((p) => p.id === 'phiwfon')
-  const phiwfon = journal.find((j) => j.slug === 'phiwfon-scent-of-air')
+  const skin = products.find((p) => p.id === 'cloud-fon')
+  const cloudFon = journal.find((j) => j.slug === 'cloud-fon-scent-of-air')
   const mainRef = useRef<HTMLElement>(null)
 
   useGSAP(
@@ -178,18 +179,18 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* PHIWFON — N°05 TEASE */}
+      {/* CLOUD FON — N°05 TEASE */}
       {skin && (
         <section className="ordi-skinscent" data-reveal>
           <div className="ordi-skinscent__grid">
             <div className="ordi-skinscent__media">
               <BottleSlot
-                image={PhiwfonHero}
-                placeholder="PHIWFON — moody close-up of skin / fabric"
+                image={CloudFonHero}
+                placeholder="CLOUD FON — moody close-up of skin / fabric"
                 alt={
                   lang === 'en'
-                    ? "Phiwfon — the scent of air that hasn't dried yet"
-                    : 'ผิวฝน กลิ่นของอากาศที่ยังไม่แห้ง'
+                    ? "CLOUD FON — the scent of air that hasn't dried yet"
+                    : 'เคล้าฝน กลิ่นของอากาศที่ยังไม่แห้ง'
                 }
                 sizes="(max-width: 768px) 100vw, 680px"
                 quality={92}
@@ -199,11 +200,11 @@ export default function HomePage() {
             <div className="ordi-skinscent__copy">
               <MonoTag>N°05 · NEW COLLECTION</MonoTag>
               <h2 className="ordi-display-lg">
-                <em>{lang === 'en' ? 'Phiwfon' : 'ผิวฝน'}</em>.
+                <em>{lang === 'en' ? 'CLOUD FON' : 'เคล้าฝน'}</em>.
               </h2>
               <p>
-                {phiwfon
-                  ? phiwfon.excerpt[lang]
+                {cloudFon
+                  ? cloudFon.excerpt[lang]
                   : lang === 'en'
                   ? "A perfume that doesn't arrive. It is already there."
                   : 'น้ำหอมที่ไม่ได้มาถึง มันอยู่ที่นั่นแล้ว'}
@@ -223,7 +224,7 @@ export default function HomePage() {
                 </div>
               </div>
               <Link
-                href="/journal/phiwfon-scent-of-air"
+                href="/journal/cloud-fon-scent-of-air"
                 className="ordi-btn ordi-btn--primary"
               >
                 {t.cta.sold_out} →

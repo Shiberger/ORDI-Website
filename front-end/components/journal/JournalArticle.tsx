@@ -15,7 +15,7 @@ const heroImageBySlug: Record<string, StaticImageData> = {
   'ordi-perfume-for-ordinary-people': Jrn000,
   'good-boy-hot-dilf-two-versions-of-warmth': Jrn001,
   'two-ways-of-feeling-close': Jrn002,
-  'phiwfon-scent-of-air': Jrn003,
+  'cloud-fon-scent-of-air': Jrn003,
 }
 
 type Props = { entry: JournalEntry; related: JournalEntry[] }

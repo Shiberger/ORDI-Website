@@ -114,8 +114,8 @@ export const products: Product[] = [
     hue: '#2A1A24',
   },
   {
-    id: 'phiwfon',
-    name: 'PHIWFON',
+    id: 'cloud-fon',
+    name: 'CLOUD FON',
     number: 'N°05',
     tagline: {
       en: 'The scent that lingers after the rain stops.',
@@ -126,8 +126,8 @@ export const products: Product[] = [
       th: 'มัสก์บรรยากาศ · กลิ่นผิว · วู้ดดี้ มัสกี้',
     },
     story: {
-      en: "Sometimes what makes us remember someone isn't their face, isn't their voice it is the faint scent that lingers after the rain has stopped. The scent of skin, of clothes, of humidity, and of the cool air in a room where the lights are still on. 'Phiwfon' was created from that feeling.",
-      th: 'บางครั้งสิ่งที่ทำให้เราจดจำใครบางคนได้ ไม่ใช่ใบหน้า ไม่ใช่เสียง แต่เป็นกลิ่นจางๆ ที่ลอยอยู่หลังฝนหยุดตก กลิ่นของผิว เสื้อผ้า ความชื้น และอากาศเย็นในห้องที่ยังเปิดไฟทิ้งไว้ "ผิวฝน" ถูกสร้างขึ้นจากความรู้สึกนั้น',
+      en: "Sometimes what makes us remember someone isn't their face, isn't their voice it is the faint scent that lingers after the rain has stopped. The scent of skin, of clothes, of humidity, and of the cool air in a room where the lights are still on. 'CLOUD FON' was created from that feeling.",
+      th: 'บางครั้งสิ่งที่ทำให้เราจดจำใครบางคนได้ ไม่ใช่ใบหน้า ไม่ใช่เสียง แต่เป็นกลิ่นจางๆ ที่ลอยอยู่หลังฝนหยุดตก กลิ่นของผิว เสื้อผ้า ความชื้น และอากาศเย็นในห้องที่ยังเปิดไฟทิ้งไว้ "เคล้าฝน" ถูกสร้างขึ้นจากความรู้สึกนั้น',
     },
     notes: {
       top: ['Rain Air Accord', 'Cold Fabric Aldehyde'],

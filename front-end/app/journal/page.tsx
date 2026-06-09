@@ -5,7 +5,7 @@ import { useApp } from '@/lib/context/AppContext'
 import { journal } from '@/lib/data/journal'
 import { MonoTag } from '@/components/ui/MonoTag'
 import { BottleSlot } from '@/components/ui/BottleSlot'
-import FeatureImage from '@/assets/journal/phiwfon_feature_article.png'
+import FeatureImage from '@/assets/journal/cloud-fon_feature_article.png'
 
 export default function JournalPage() {
   const { lang } = useApp()
