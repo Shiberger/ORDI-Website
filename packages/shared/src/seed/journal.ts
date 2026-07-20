@@ -1,6 +1,6 @@
-import type { JournalEntry } from '@/types/product'
+import type { JournalEntry } from '../types/product'
 
-export const journal: JournalEntry[] = [
+export const seedJournal: JournalEntry[] = [
   {
     id: 'j03',
     slug: 'cloud-fon-scent-of-air',
@@ -94,11 +94,3 @@ export const journal: JournalEntry[] = [
     readtime: '5 min',
   },
 ]
-
-export function getJournalBySlug(slug: string): JournalEntry | undefined {
-  return journal.find((j) => j.slug === slug)
-}
-
-export function getJournalSlugs(): string[] {
-  return journal.map((j) => j.slug)
-}

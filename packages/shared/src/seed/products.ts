@@ -1,6 +1,6 @@
-import type { Product } from '@/types/product'
+import type { Product } from '../types/product'
 
-export const products: Product[] = [
+export const seedProducts: Product[] = [
   {
     id: 'good-boy',
     name: 'GOOD BOY',
@@ -28,6 +28,7 @@ export const products: Product[] = [
     ],
     status: 'available',
     hue: '#EFEAE0',
+    image_url: null,
   },
   {
     id: 'hot-dilf',
@@ -56,6 +57,7 @@ export const products: Product[] = [
     ],
     status: 'available',
     hue: '#1A1612',
+    image_url: null,
   },
   {
     id: 'sea-breeze',
@@ -84,6 +86,7 @@ export const products: Product[] = [
     ],
     status: 'available',
     hue: '#D8DEE0',
+    image_url: null,
   },
   {
     id: 'drowning-love',
@@ -112,6 +115,7 @@ export const products: Product[] = [
     ],
     status: 'available',
     hue: '#2A1A24',
+    image_url: null,
   },
   {
     id: 'cloud-fon',
@@ -140,13 +144,6 @@ export const products: Product[] = [
     ],
     status: 'coming-soon',
     hue: '#E8E0D6',
+    image_url: null,
   },
 ]
-
-export function getProductById(id: string): Product | undefined {
-  return products.find((p) => p.id === id)
-}
-
-export function getProductSlugs(): string[] {
-  return products.map((p) => p.id)
-}
