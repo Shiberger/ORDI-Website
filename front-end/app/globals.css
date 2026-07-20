@@ -1583,6 +1583,40 @@ main {
   border-bottom: 1px solid var(--ink);
 }
 .ordi-thanks__meta > div { display: flex; flex-direction: column; gap: 6px; font-family: var(--serif); font-size: 18px; }
+.ordi-thanks__items { width: 100%; display: flex; flex-direction: column; }
+
+/* Checkout — review step, notices, errors */
+.ordi-checkout__notice,
+.ordi-checkout__error {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+  padding: 12px 14px;
+  border: 1px solid var(--ink);
+  margin: 0 0 24px;
+}
+.ordi-checkout__error { margin: 16px 0 0; background: var(--ink); color: var(--paper); }
+.ordi-checkout__securenote {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  line-height: 1.7;
+  color: var(--ink-soft);
+  margin: 4px 0 0;
+}
+.ordi-review { display: flex; flex-direction: column; gap: 18px; margin: 0; }
+.ordi-review > div { display: flex; flex-direction: column; gap: 6px; }
+.ordi-review dt {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.ordi-review dd { margin: 0; font-family: var(--serif); font-size: 17px; line-height: 1.55; }
+
+.ordi-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* ============================================================
    ABOUT
