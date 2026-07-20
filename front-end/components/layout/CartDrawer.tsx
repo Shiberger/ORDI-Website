@@ -3,12 +3,12 @@
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { useApp } from '@/lib/context/AppContext'
-import { products } from '@/lib/data/products'
 import { cn, formatPrice, isDarkHue } from '@/lib/utils'
 import { MonoTag } from '@/components/ui/MonoTag'
 
 export function CartDrawer() {
-  const { drawerOpen, setDrawerOpen, cart, subtotal, setQty, removeFromCart, t } = useApp()
+  const { drawerOpen, setDrawerOpen, cart, subtotal, setQty, removeFromCart, t, products } =
+    useApp()
   const router = useRouter()
 
   useEffect(() => {

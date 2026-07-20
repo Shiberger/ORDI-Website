@@ -6,9 +6,7 @@ import gsap from 'gsap'
 import { SplitText } from 'gsap/SplitText'
 import { useGSAP } from '@gsap/react'
 import { useApp } from '@/lib/context/AppContext'
-import { products } from '@/lib/data/products'
 import { getProductImage } from '@/lib/data/product-images'
-import { journal } from '@/lib/data/journal'
 import { MonoTag } from '@/components/ui/MonoTag'
 import { SectionHead } from '@/components/ui/SectionHead'
 import { Marquee } from '@/components/ui/Marquee'
@@ -20,7 +18,7 @@ import CloudFonHero from '@/assets/journal/cloud-fon_feature_article.png'
 gsap.registerPlugin(SplitText)
 
 export default function HomePage() {
-  const { t, lang } = useApp()
+  const { t, lang, products, journal } = useApp()
   const featured = products.slice(0, 4)
   const skin = products.find((p) => p.id === 'cloud-fon')
   const cloudFon = journal.find((j) => j.slug === 'cloud-fon-scent-of-air')
@@ -151,7 +149,7 @@ export default function HomePage() {
             <Link className="ordi-pcard" key={p.id} href={`/shop/${p.id}`}>
               <div className="ordi-pcard__media" style={{ background: p.hue }}>
                 <BottleSlot
-                  image={getProductImage(p.id)}
+                  image={getProductImage(p)}
                   placeholder={`${p.name} — bottle on ${isDarkHue(p.hue) ? 'dark' : 'neutral'} backdrop`}
                   alt={`${p.name} ${p.number} — eau de parfum`}
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"

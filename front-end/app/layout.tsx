@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Geist_Mono } from 'next/font/google'
 import { AppProvider } from '@/lib/context/AppContext'
+import { getJournal, getProducts } from '@/lib/data/catalog'
 import { Nav } from '@/components/layout/Nav'
 import { Footer } from '@/components/layout/Footer'
 import { CartDrawer } from '@/components/layout/CartDrawer'
@@ -46,7 +47,11 @@ export const viewport: Viewport = {
   viewportFit: 'cover',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Fetched once on the server and handed to every client view through
+  // AppProvider — the cart, drawer and shop grid all need the same catalogue.
+  const [products, journal] = await Promise.all([getProducts(), getJournal()])
+
   return (
     <html lang="en" className={geistMono.variable}>
       <head>
@@ -57,7 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
-        <AppProvider>
+        <AppProvider products={products} journal={journal}>
           <Nav />
           <SmoothScroll>
             {children}

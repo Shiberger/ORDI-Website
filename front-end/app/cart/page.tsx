@@ -2,12 +2,11 @@
 
 import Link from 'next/link'
 import { useApp } from '@/lib/context/AppContext'
-import { products } from '@/lib/data/products'
 import { MonoTag } from '@/components/ui/MonoTag'
 import { formatPrice } from '@/lib/utils'
 
 export default function CartPage() {
-  const { cart, subtotal, setQty, removeFromCart, t, lang } = useApp()
+  const { cart, subtotal, setQty, removeFromCart, t, lang, products } = useApp()
 
   return (
     <main className="ordi-cartpage">

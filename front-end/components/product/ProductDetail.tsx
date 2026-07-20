@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { products } from '@/lib/data/products'
 import { getProductImage } from '@/lib/data/product-images'
 import { useApp } from '@/lib/context/AppContext'
 import { MonoTag } from '@/components/ui/MonoTag'
@@ -14,7 +13,7 @@ import type { Product } from '@/types/product'
 type Props = { product: Product }
 
 export function ProductDetail({ product: p }: Props) {
-  const { t, lang, wishlist, toggleWishlist } = useApp()
+  const { t, lang, wishlist, toggleWishlist, products } = useApp()
   const [size, setSize] = useState(p.sizes[0].ml)
   const [hoverNote, setHoverNote] = useState<string | null>(null)
   const selectedSize = p.sizes.find((s) => s.ml === size) ?? p.sizes[0]
@@ -34,7 +33,7 @@ export function ProductDetail({ product: p }: Props) {
       <section className="ordi-product__top">
         <div className="ordi-product__media" style={{ background: p.hue }}>
           <BottleSlot
-            image={getProductImage(p.id)}
+            image={getProductImage(p)}
             placeholder={`${p.name} — large editorial bottle shot`}
             alt={`${p.name} ${p.number} — editorial bottle shot`}
             sizes="(max-width: 768px) 100vw, 50vw"
@@ -219,7 +218,7 @@ export function ProductDetail({ product: p }: Props) {
             <Link className="ordi-pcard" key={o.id} href={`/shop/${o.id}`}>
               <div className="ordi-pcard__media" style={{ background: o.hue }}>
                 <BottleSlot
-                  image={getProductImage(o.id)}
+                  image={getProductImage(o)}
                   placeholder={o.name}
                   alt={`${o.name} ${o.number}`}
                   sizes="(max-width: 768px) 100vw, 33vw"

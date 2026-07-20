@@ -1,11 +1,12 @@
 import type { MetadataRoute } from 'next'
-import { products } from '@/lib/data/products'
+import { getJournal, getProducts } from '@/lib/data/catalog'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date()
   const staticRoutes = ['', '/shop', '/about', '/journal', '/membership']
+  const [products, journal] = await Promise.all([getProducts(), getJournal()])
 
   return [
     ...staticRoutes.map((path) => ({
@@ -19,6 +20,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: 'monthly' as const,
       priority: 0.9,
+    })),
+    ...journal.map((j) => ({
+      url: `${SITE_URL}/journal/${j.slug}`,
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
     })),
   ]
 }
