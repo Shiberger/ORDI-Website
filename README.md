@@ -2,7 +2,7 @@
 
 > **Out of Ordinary, Only Ous** — an editorial, gallery-like storefront for a small Bangkok-based perfume studio.
 
-**🔗 Live demo:** **[ordi-website-skfn.vercel.app](https://ordi-website-skfn.vercel.app/)**
+**🔗 Live:** **[ordibkk.com](https://ordibkk.com/)** · dashboard at [admin.ordibkk.com](https://admin.ordibkk.com/)
 
 ORDI is a bilingual (English / Thai) brand portfolio and premium order channel for a niche fragrance house. The design language is monochrome, typographic, and quiet — built to feel less like a store and more like a printed lookbook that happens to sell perfume.
 

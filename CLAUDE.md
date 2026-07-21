@@ -38,8 +38,8 @@
 | CMS | The `admin/` dashboard | Products + journal live in Postgres, edited in-house |
 | Images | next/image + Supabase Storage | Brand art ships in the bundle as WebP; product shots upload from the dashboard |
 | Email | Resend (transactional) | Good Thai deliverability |
-| Hosting | Vercel (2 projects) | ordi.com + admin.ordi.com from one repo |
-| Domain | Cloudflare Registrar | DNS + CDN + DDoS in one place |
+| Hosting | Vercel (4 projects) | prod + dev of each app, from one repo |
+| Domain | Vercel Registrar | Bought where it is served — no DNS records to keep in sync |
 
 ### What we are NOT using (yet)
 - ❌ Bank transfer (PromptPay is a Stripe Dashboard toggle when wanted)
@@ -161,7 +161,7 @@ from the repo root:
 
 ## 4. Routing Map
 
-### Storefront — `front-end/` (ordi.com)
+### Storefront — `front-end/` (ordibkk.com)
 
 | URL | Purpose | Render |
 |---|---|---|
@@ -180,7 +180,7 @@ from the repo root:
 | `/api/webhooks/stripe` | Payment lifecycle | Route handler |
 | `/api/revalidate` | Bearer-token ISR purge | Route handler |
 
-### Dashboard — `admin/` (admin.ordi.com)
+### Dashboard — `admin/` (admin.ordibkk.com)
 
 | URL | Purpose |
 |---|---|
@@ -355,7 +355,7 @@ Test card: `4242 4242 4242 4242`, any future expiry, any CVC.
 
 ### Production webhook
 
-Stripe Dashboard → Developers → Webhooks → `https://ordi.com/api/webhooks/stripe`
+Stripe Dashboard → Developers → Webhooks → `https://ordibkk.com/api/webhooks/stripe`
 with `checkout.session.completed`, `checkout.session.expired`,
 `charge.refunded`. Copy the signing secret into Vercel env vars.
 
@@ -399,6 +399,33 @@ const messages = {
 
 ## 9. Environment Variables
 
+### Where each environment lives
+
+Four Vercel projects, two Supabase projects. The split is deliberate: the
+production database is only ever reachable from things named `ordi-web` /
+`ordi-admin`, so "which environment am I looking at" is answerable from the URL
+alone rather than by auditing env vars.
+
+| Vercel project | Root | URL | Supabase | Stripe |
+|---|---|---|---|---|
+| `ordi-web` | `front-end/` | ordibkk.com | ordi-website (prod) | test until launch |
+| `ordi-admin` | `admin/` | admin.ordibkk.com | ordi-website (prod) | — |
+| `ordi-dev-web` | `front-end/` | ordi-dev-web.vercel.app | ordi-dev | test |
+| `ordi-dev-admin` | `admin/` | ordi-dev-admin.vercel.app | ordi-dev | — |
+
+`REVALIDATE_SECRET` is different per environment on purpose — a dev dashboard
+must not be able to purge the production storefront's cache.
+
+Vercel marks Production env vars **sensitive** by default, so `vercel env pull`
+returns them empty. That is expected; it does not mean the value is missing.
+Add them with `vercel env add KEY production --value …` — piping the value to
+stdin silently stores an empty string.
+
+`ordi-website-skfn` is the frozen Phase 0 demo. It has no env vars, runs off the
+seed catalogue, and has been disconnected from GitHub so it never rebuilds.
+
+### Local files
+
 Two `.env.local` files, one per app. Templates live beside them as
 `.env.example`. Never commit either.
 
@@ -417,7 +444,7 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_xxx
 
 # Resend — optional; emails are skipped when unset
 RESEND_API_KEY=re_xxx
-RESEND_FROM_EMAIL=orders@ordi.com
+RESEND_FROM_EMAIL=orders@ordibkk.com
 
 # Shared with the dashboard — openssl rand -hex 32
 REVALIDATE_SECRET=
@@ -452,7 +479,7 @@ the signed-in admin so RLS — not application code — is what enforces access.
 ## 10. Admin Dashboard
 
 A second Next.js app in `admin/`, deployed as its own Vercel project pointed at
-`admin.ordi.com`. It shares the Supabase project and `@ordi/shared` with the
+`admin.ordibkk.com`. It shares the Supabase project and `@ordi/shared` with the
 storefront, and nothing else — dashboard code never ships in the customer
 bundle.
 

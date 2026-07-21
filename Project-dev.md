@@ -238,7 +238,7 @@ and the receipt email arrives.
 - [ ] Printable shipping labels
 - [ ] Customer list view
 
-**✅ Done when:** a new fragrance added in the dashboard appears on ordi.com
+**✅ Done when:** a new fragrance added in the dashboard appears on ordibkk.com
 without a deploy.
 
 ---
@@ -269,8 +269,8 @@ Guest checkout ships first, so this is now optional rather than blocking.
 
 ## 🚧 Phase 7: Production deploy (NOT STARTED)
 
-- [ ] Vercel project 1 — root `front-end/` → ordi.com
-- [ ] Vercel project 2 — root `admin/` → admin.ordi.com
+- [ ] Vercel project 1 — root `front-end/` → ordibkk.com
+- [ ] Vercel project 2 — root `admin/` → admin.ordibkk.com
 - [ ] Env vars in both (same `REVALIDATE_SECRET`)
 - [ ] Stripe production webhook
 - [ ] Cloudflare DNS
