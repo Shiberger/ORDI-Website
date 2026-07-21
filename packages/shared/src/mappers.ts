@@ -41,6 +41,7 @@ export function mapProductRow(row: ProductRowWithSizes): AdminProduct {
     status: row.status as ProductStatus,
     hue: row.hue,
     image_url: row.image_url,
+    featured: row.featured,
     published: row.published,
     sort_order: row.sort_order,
     created_at: row.created_at,
@@ -62,6 +63,7 @@ export function toProductRow(
     | 'status'
     | 'hue'
     | 'image_url'
+    | 'featured'
     | 'published'
     | 'sort_order'
   >
@@ -82,6 +84,7 @@ export function toProductRow(
     status: product.status,
     hue: product.hue,
     image_url: product.image_url,
+    featured: product.featured,
     published: product.published,
     sort_order: product.sort_order,
   }

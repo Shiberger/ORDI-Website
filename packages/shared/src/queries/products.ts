@@ -62,6 +62,7 @@ export type ProductInput = Pick<
   | 'status'
   | 'hue'
   | 'image_url'
+  | 'featured'
   | 'published'
   | 'sort_order'
 > & { sizes: ProductSize[] }
@@ -75,6 +76,20 @@ export async function upsertProduct(db: DB, input: ProductInput): Promise<void> 
   const { sizes, ...product } = input
 
   unwrap('upsertProduct', await db.from('products').upsert(toProductRow(product)).select('id'))
+
+  // The home page has room for exactly one spotlight, so featuring a fragrance
+  // un-features whatever held the slot before.
+  if (product.featured) {
+    unwrap(
+      'upsertProduct/clearOtherFeatured',
+      await db
+        .from('products')
+        .update({ featured: false })
+        .eq('featured', true)
+        .neq('id', product.id)
+        .select('id')
+    )
+  }
 
   unwrap(
     'upsertProduct/clearSizes',

@@ -29,6 +29,7 @@ export const seedProducts: Product[] = [
     status: 'available',
     hue: '#EFEAE0',
     image_url: null,
+    featured: false,
   },
   {
     id: 'hot-dilf',
@@ -58,6 +59,7 @@ export const seedProducts: Product[] = [
     status: 'available',
     hue: '#1A1612',
     image_url: null,
+    featured: false,
   },
   {
     id: 'sea-breeze',
@@ -87,6 +89,7 @@ export const seedProducts: Product[] = [
     status: 'available',
     hue: '#D8DEE0',
     image_url: null,
+    featured: false,
   },
   {
     id: 'drowning-love',
@@ -116,6 +119,7 @@ export const seedProducts: Product[] = [
     status: 'available',
     hue: '#2A1A24',
     image_url: null,
+    featured: false,
   },
   {
     id: 'cloud-fon',
@@ -139,11 +143,12 @@ export const seedProducts: Product[] = [
       base: ['Oakmoss', 'Warm Skin Musk'],
     },
     sizes: [
-      { ml: 50, price: 1390 },
-      { ml: 12, price: 390 },
+      { ml: 50, price: 1490 },
+      { ml: 12, price: 490 },
     ],
-    status: 'coming-soon',
-    hue: '#E8E0D6',
+    status: 'available',
+    hue: '#1C2A20',
     image_url: null,
+    featured: true,
   },
 ]

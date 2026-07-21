@@ -36,7 +36,7 @@
 | Auth | Supabase Auth | Admins now; customer OAuth in Phase 5 |
 | Payment | Stripe Checkout (hosted) | International cards, no PCI burden |
 | CMS | The `admin/` dashboard | Products + journal live in Postgres, edited in-house |
-| Images | next/image + Cloudinary | Auto WebP, lazy loading |
+| Images | next/image + Supabase Storage | Brand art ships in the bundle as WebP; product shots upload from the dashboard |
 | Email | Resend (transactional) | Good Thai deliverability |
 | Hosting | Vercel (2 projects) | ordi.com + admin.ordi.com from one repo |
 | Domain | Cloudflare Registrar | DNS + CDN + DDoS in one place |
@@ -214,6 +214,9 @@ Dashboard — add a migration instead.
 |---|---|
 | `0001_core_schema.sql` | `profiles` (with `role`), `orders`, `order_items`, `shipping_addresses`, `wishlists`, `newsletter_subscribers`, `member_tiers` view, `is_admin()`, signup trigger |
 | `0002_content_schema.sql` | `products`, `product_sizes`, `journal_entries` + their RLS |
+| `0003_product_featured.sql` | `products.featured` — the home-page spotlight flag |
+| `0004_cloud_fon_launch.sql` | Data only — N°05 goes on sale, hue follows its art |
+| `0005_product_image_storage.sql` | `product-images` bucket + its storage policies |
 
 ### Content tables
 
@@ -460,7 +463,7 @@ bundle.
 | Dashboard | 30-day revenue, AOV, units, unpaid + unshipped counts, daily bar chart, best sellers |
 | Orders | Filter by status, search by id/email, paginate; open an order to see items, address, payment ids and timeline |
 | Fulfilment | Change status, set carrier + tracking number, leave an internal note |
-| Products | Create, edit, delete; bilingual copy, notes, hue, image URL, publish toggle, sort order, per-size pricing |
+| Products | Create, edit, delete; bilingual copy, notes, hue, image upload, publish toggle, featured toggle, sort order, per-size pricing |
 | Journal | Create, edit, delete; bilingual title/excerpt/body, slug, publish toggle, auto read-time |
 
 ### Content → storefront propagation
@@ -473,6 +476,23 @@ affected paths, so edits appear immediately instead of within the hour.
 The call is deliberately **non-fatal**: the row is already committed and the
 hourly revalidate is the backstop, so a failed ping logs and moves on rather
 than turning a successful save into an error.
+
+### Where images live
+
+Two homes, split by who changes them — not by file type:
+
+| Art | Home | Why |
+|---|---|---|
+| Brand + editorial (hero, journal, campaign plates) | `front-end/assets/**` as WebP, imported statically | Changes only with the design. Static imports give `next/image` build-time dimensions and a blur placeholder for free |
+| Product photography | `product-images` bucket in Supabase Storage → `products.image_url` | The studio replaces a bottle shot from the dashboard without a deploy |
+
+Uploads go browser → Storage directly (`uploadProductImage()` in `@ordi/shared`),
+never through a server action, so an image never travels in a Next request body.
+The bucket policies in migration 0005 are the access boundary.
+
+`getProductImage()` prefers `image_url` and falls back to the bundled art, so a
+fragrance with no upload still renders. Keep bundled art as WebP — the repo
+carried 35 MB of PNG before the conversion and now carries 4 MB.
 
 ### Writing new dashboard features
 

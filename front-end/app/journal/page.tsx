@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useApp } from '@/lib/context/AppContext'
 import { MonoTag } from '@/components/ui/MonoTag'
 import { BottleSlot } from '@/components/ui/BottleSlot'
-import FeatureImage from '@/assets/journal/cloud-fon_feature_article.png'
+import FeatureImage from '@/assets/journal/cloud-fon_feature_article.webp'
 
 export default function JournalPage() {
   const { lang, journal } = useApp()

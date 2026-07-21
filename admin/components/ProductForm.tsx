@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 import type { AdminProduct, ProductSize } from '@ordi/shared'
 import { deleteProductAction, saveProductAction } from '@/lib/actions/products'
+import { ProductImageField } from '@/components/ProductImageField'
 
 type Props = {
   /** Undefined when creating a new fragrance. */
@@ -108,18 +109,19 @@ export function ProductForm({ product, nextSortOrder = 0 }: Props) {
           </label>
         </div>
 
-        <label className="field">
-          <span>Image URL</span>
-          <input
-            name="image_url"
-            defaultValue={product?.image_url ?? ''}
-            placeholder="https://…  (leave blank to use bundled studio art)"
-          />
-        </label>
+        <ProductImageField
+          productId={product?.id ?? ''}
+          defaultValue={product?.image_url ?? ''}
+        />
 
         <label className="checkbox">
           <input type="checkbox" name="published" defaultChecked={product?.published ?? true} />
           <span>Published — visible on the storefront</span>
+        </label>
+
+        <label className="checkbox">
+          <input type="checkbox" name="featured" defaultChecked={product?.featured ?? false} />
+          <span>Featured — spotlit on the home page (replaces the current one)</span>
         </label>
       </section>
 

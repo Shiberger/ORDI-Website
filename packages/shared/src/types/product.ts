@@ -33,6 +33,8 @@ export type Product = {
   hue: string
   /** Remote/uploaded art. Null falls back to the bundled photography. */
   image_url: string | null
+  /** Spotlit above the collection grid on the home page. At most one is true. */
+  featured: boolean
 }
 
 /** Product plus the editorial fields only the admin dashboard cares about. */

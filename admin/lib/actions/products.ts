@@ -53,6 +53,7 @@ export async function saveProductAction(formData: FormData): Promise<ActionResul
       status,
       hue: str(formData, 'hue') || '#EFEAE0',
       image_url: str(formData, 'image_url') || null,
+      featured: formData.get('featured') === 'on',
       published: formData.get('published') === 'on',
       sort_order: Number(formData.get('sort_order')) || 0,
       sizes: sizes.value,

@@ -24,7 +24,6 @@ export type UIStrings = {
   cta: {
     shop_all: string
     add_to_cart: string
-    shop_online: string
     sold_out: string
     view_product: string
     checkout: string
@@ -47,6 +46,7 @@ export type UIStrings = {
     story: string
   }
   coming_soon: string
+  now_available: string
   sold_out: string
   empty_cart: string
   cart_title: string
@@ -66,7 +66,6 @@ export const uiStrings: Record<Lang, UIStrings> = {
     cta: {
       shop_all: 'Shop the collection',
       add_to_cart: 'Add to cart',
-      shop_online: 'Shopping Online',
       sold_out: 'Notify me',
       view_product: 'View',
       checkout: 'Proceed to checkout',
@@ -107,6 +106,7 @@ export const uiStrings: Record<Lang, UIStrings> = {
       channel_email_desc: 'For wholesale, press, collaborations, and anything that needs a longer reply.',
     },
     coming_soon: 'Coming soon',
+    now_available: 'Now available',
     sold_out: 'Sold out',
     empty_cart: 'Your cart is empty.',
     cart_title: 'Cart',
@@ -124,7 +124,6 @@ export const uiStrings: Record<Lang, UIStrings> = {
     cta: {
       shop_all: 'ดูคอลเลกชั่นทั้งหมด',
       add_to_cart: 'เพิ่มลงตะกร้า',
-      shop_online: 'ช้อปออนไลน์',
       sold_out: 'แจ้งเตือนเมื่อมีสินค้า',
       view_product: 'ดูสินค้า',
       checkout: 'ดำเนินการชำระเงิน',
@@ -165,6 +164,7 @@ export const uiStrings: Record<Lang, UIStrings> = {
       channel_email_desc: 'สำหรับการขายส่ง สื่อมวลชน คอลแลบ และเรื่องที่ต้องการคำตอบยาว ๆ',
     },
     coming_soon: 'เร็วๆ นี้',
+    now_available: 'วางจำหน่ายแล้ว',
     sold_out: 'สินค้าหมด',
     empty_cart: 'ตะกร้าของคุณว่างเปล่า',
     cart_title: 'ตะกร้า',

@@ -16,6 +16,9 @@ export default function ShopPage() {
   const [hover, setHover] = useState<string | null>(null)
 
   const visible = products.filter((p) => filter === 'all' || p.status === filter)
+  // With the whole collection shipping there is nothing behind this tab, so it
+  // only appears once something is actually upcoming again.
+  const hasUpcoming = products.some((p) => p.status === 'coming-soon')
 
   return (
     <main className="ordi-shop">
@@ -31,7 +34,7 @@ export default function ShopPage() {
             [
               { id: 'all', label: lang === 'en' ? 'All' : 'ทั้งหมด' },
               { id: 'available', label: lang === 'en' ? 'In stock' : 'พร้อมส่ง' },
-              { id: 'coming-soon', label: t.coming_soon },
+              ...(hasUpcoming ? [{ id: 'coming-soon', label: t.coming_soon }] : []),
             ] as { id: Filter; label: string }[]
           ).map((f) => (
             <button

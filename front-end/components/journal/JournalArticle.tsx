@@ -6,16 +6,25 @@ import { useApp } from '@/lib/context/AppContext'
 import { MonoTag } from '@/components/ui/MonoTag'
 import { BottleSlot } from '@/components/ui/BottleSlot'
 import type { JournalEntry } from '@/types/product'
-import Jrn000 from '@/assets/journal/jrn-000.png'
-import Jrn001 from '@/assets/journal/jrn-001.png'
-import Jrn002 from '@/assets/journal/jrn-002.png'
-import Jrn003 from '@/assets/journal/jrn-003.png'
+import Jrn000 from '@/assets/journal/jrn-000.webp'
+import Jrn001 from '@/assets/journal/jrn-001.webp'
+import Jrn002 from '@/assets/journal/jrn-002.webp'
+import Jrn003 from '@/assets/journal/jrn-003.webp'
+import CloudFonPostcard from '@/assets/products/cloudfon/Postcard-front.webp'
 
 const heroImageBySlug: Record<string, StaticImageData> = {
   'ordi-perfume-for-ordinary-people': Jrn000,
   'good-boy-hot-dilf-two-versions-of-warmth': Jrn001,
   'two-ways-of-feeling-close': Jrn002,
   'cloud-fon-scent-of-air': Jrn003,
+}
+
+/**
+ * The campaign plate that closes an article. Portrait, with its own copy baked
+ * in, so it runs at reading width rather than full bleed.
+ */
+const plateBySlug: Record<string, StaticImageData> = {
+  'cloud-fon-scent-of-air': CloudFonPostcard,
 }
 
 type Props = { entry: JournalEntry; related: JournalEntry[] }
@@ -68,6 +77,18 @@ export function JournalArticle({ entry, related }: Props) {
             <p key={i}>{p}</p>
           ))}
         </article>
+      )}
+
+      {plateBySlug[entry.slug] && (
+        <figure className="ordi-jpost__plate">
+          <BottleSlot
+            image={plateBySlug[entry.slug]}
+            placeholder={`${entry.number} — campaign plate`}
+            alt={entry.title[lang]}
+            sizes="(max-width: 767px) 100vw, 620px"
+            quality={90}
+          />
+        </figure>
       )}
 
       {related.length > 0 && (

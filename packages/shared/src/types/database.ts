@@ -28,6 +28,7 @@ type ProductRow = {
   hue: string
   image_url: string | null
   published: boolean
+  featured: boolean
   sort_order: number
   created_at: string
   updated_at: string

@@ -691,17 +691,17 @@ main {
 }
 
 /* ============================================================
-   SKIN SCENT TEASE
+   FEATURED PERFUME (Home — the launch band)
    ============================================================ */
 
-.ordi-skinscent {
+.ordi-featured {
   margin: var(--section-y) calc(-1 * var(--gutter-x)) 0;
   padding: var(--section-y) var(--gutter-x);
   background: var(--ink);
   color: var(--paper);
 }
-.ordi-skinscent .ordi-mono-tag { color: rgba(245, 242, 236, 0.6); }
-.ordi-skinscent__grid {
+.ordi-featured .ordi-mono-tag { color: rgba(245, 242, 236, 0.6); }
+.ordi-featured__grid {
   max-width: var(--container);
   margin: 0 auto;
   display: grid;
@@ -709,12 +709,24 @@ main {
   gap: 80px;
   align-items: center;
 }
-.ordi-skinscent__media {
+.ordi-featured__media {
   aspect-ratio: 4/5;
   background: #1a1a1a;
   position: relative;
+  display: block;
+  overflow: hidden;
+  transition: transform 0.5s cubic-bezier(0.2, 0.6, 0.2, 1);
 }
-.ordi-skinscent__chip {
+.ordi-featured__media:hover { transform: scale(0.985); }
+.ordi-featured__num {
+  position: absolute;
+  top: 20px; left: 20px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: rgba(245, 242, 236, 0.85);
+}
+.ordi-featured__chip {
   position: absolute;
   top: 20px; right: 20px;
   font-family: var(--mono);
@@ -726,11 +738,11 @@ main {
   border-radius: 100px;
   white-space: nowrap;
 }
-.ordi-skinscent__copy { display: flex; flex-direction: column; gap: 24px; align-items: flex-start; }
-.ordi-skinscent__copy .ordi-display-lg { color: var(--paper); }
-.ordi-skinscent__copy p { max-width: 480px; color: rgba(245, 242, 236, 0.75); margin: 0; font-size: 16px; line-height: 1.5; }
-.ordi-skinscent__notes { display: flex; flex-direction: column; gap: 16px; margin: 16px 0 8px; width: 100%; max-width: 480px; }
-.ordi-skinscent__notes > div {
+.ordi-featured__copy { display: flex; flex-direction: column; gap: 24px; align-items: flex-start; }
+.ordi-featured__copy .ordi-display-lg { color: var(--paper); }
+.ordi-featured__copy p { max-width: 480px; color: rgba(245, 242, 236, 0.75); margin: 0; font-size: 16px; line-height: 1.5; }
+.ordi-featured__notes { display: flex; flex-direction: column; gap: 16px; margin: 16px 0 8px; width: 100%; max-width: 480px; }
+.ordi-featured__notes > div {
   display: grid;
   grid-template-columns: 90px 1fr;
   gap: 16px;
@@ -739,8 +751,35 @@ main {
   font-family: var(--serif);
   font-size: 16px;
 }
-.ordi-skinscent .ordi-btn--primary { background: var(--paper); color: var(--ink); }
-.ordi-skinscent .ordi-btn--primary:hover { background: #fff; }
+/* Beats `.ordi-featured__copy p` above, which would otherwise win on element
+   specificity and flatten the lead line back to body size. */
+.ordi-featured__copy p.ordi-featured__tagline {
+  font-family: var(--serif);
+  font-size: clamp(18px, 2vw, 24px);
+  line-height: 1.3;
+  color: var(--paper);
+  max-width: 480px;
+  margin: 0;
+}
+.ordi-featured__foot {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.ordi-featured__price {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: rgba(245, 242, 236, 0.8);
+}
+.ordi-featured .ordi-btn--primary { background: var(--paper); color: var(--ink); }
+.ordi-featured .ordi-btn--primary:hover { background: #fff; }
+.ordi-featured .ordi-btn--ghost { border-color: rgba(245, 242, 236, 0.35); color: var(--paper); }
+.ordi-featured .ordi-btn--ghost:hover { background: rgba(245, 242, 236, 0.12); }
 
 /* ============================================================
    PRESS
@@ -1252,6 +1291,19 @@ main {
   gap: 12px;
   font-size: 13px;
   color: var(--ink-soft);
+}
+
+/* Product gallery — extra stills under the hero, only for shoots that have them */
+.ordi-product__gallery {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.ordi-product__plate {
+  position: relative;
+  aspect-ratio: 4/5;
+  overflow: hidden;
 }
 
 /* Pyramid */
@@ -1766,6 +1818,14 @@ main {
   margin: 0 auto;
 }
 
+.ordi-jpost__plate {
+  aspect-ratio: 1748/2480;
+  max-width: 620px;
+  width: 100%;
+  margin: 8px auto 40px;
+  background: var(--paper-2);
+}
+
 .ordi-jpost__body {
   display: flex;
   flex-direction: column;
@@ -2144,7 +2204,7 @@ image-slot {
   display: block;
 }
 
-.ordi-skinscent__media image-slot,
+.ordi-featured__media image-slot,
 .ordi-product__media.is-dark image-slot {
   --image-slot-fg: rgba(245, 242, 236, 0.55);
   --image-slot-border: rgba(245, 242, 236, 0.18);
@@ -2165,12 +2225,13 @@ image-slot {
 @media (max-width: 1100px) {
   .ordi-hero__bottom { grid-template-columns: 1fr; gap: 24px; }
   .ordi-hero__cta { justify-content: flex-start; }
-  .ordi-product__top, .ordi-skinscent__grid, .ordi-about__intro,
+  .ordi-product__top, .ordi-featured__grid, .ordi-about__intro,
   .ordi-about__founders, .ordi-journal__feature, .ordi-auth { grid-template-columns: 1fr; gap: 48px; }
   .ordi-collection__grid, .ordi-companion__grid, .ordi-press__grid,
   .ordi-about__values, .ordi-tiers, .ordi-account__signed-grid,
   .ordi-pyramid__grid, .ordi-process, .ordi-journal__grid--home { grid-template-columns: 1fr 1fr; }
   .ordi-shop__gallery { grid-template-columns: repeat(3, 1fr); }
+  .ordi-product__gallery { grid-template-columns: repeat(2, 1fr); gap: 12px; }
   .ordi-checkout__grid, .ordi-cartpage__grid { grid-template-columns: 1fr; }
   .ordi-contact__grid { grid-template-columns: 1fr; }
   .ordi-contact__meta { grid-template-columns: 1fr; }
@@ -2345,7 +2406,7 @@ image-slot {
     margin-bottom: 40px;
   }
   /* Skin Scent panel notes get a tighter label column */
-  .ordi-skinscent__notes > div { grid-template-columns: 72px 1fr; gap: 12px; }
+  .ordi-featured__notes > div { grid-template-columns: 72px 1fr; gap: 12px; }
 }
 
 @media (max-width: 767px) {
@@ -2426,8 +2487,9 @@ image-slot {
   .ordi-contact__meta dt { font-size: 10.5px; }
 
   /* ---------- Skin Scent (dark panel) ---------- */
-  .ordi-skinscent__grid { gap: 32px; }
-  .ordi-skinscent__notes > div { font-size: 14px; padding: 12px 0; }
+  .ordi-featured__grid { gap: 32px; }
+  .ordi-featured__notes > div { font-size: 14px; padding: 12px 0; }
+  .ordi-featured__foot { gap: 16px; }
 
   /* ---------- Press blockquotes ---------- */
   .ordi-press__grid { gap: 16px; margin-top: 28px; }
@@ -2518,13 +2580,13 @@ image-slot {
 }
 
 /* Subtle texture also blooms into the dark Skin Scent panel for cohesion */
-[data-texture="subtle"] .ordi-skinscent,
-[data-texture="poster"] .ordi-skinscent {
+[data-texture="subtle"] .ordi-featured,
+[data-texture="poster"] .ordi-featured {
   position: relative;
   overflow: hidden;
 }
-[data-texture="subtle"] .ordi-skinscent::before,
-[data-texture="poster"] .ordi-skinscent::before {
+[data-texture="subtle"] .ordi-featured::before,
+[data-texture="poster"] .ordi-featured::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -2534,9 +2596,9 @@ image-slot {
   mask-image: linear-gradient(135deg, transparent 50%, #000 100%);
   pointer-events: none;
 }
-[data-texture="subtle"] .ordi-skinscent > *,
-[data-texture="poster"] .ordi-skinscent > * { position: relative; z-index: 1; }
-[data-texture="poster"] .ordi-skinscent::before {
+[data-texture="subtle"] .ordi-featured > *,
+[data-texture="poster"] .ordi-featured > * { position: relative; z-index: 1; }
+[data-texture="poster"] .ordi-featured::before {
   background-image: radial-gradient(circle, rgba(245,242,236,0.32) 1.2px, transparent 1.7px);
 }
 /* ============================================================
@@ -2603,7 +2665,8 @@ image-slot {
 .ordi-thanks p,
 .ordi-thanks__meta > div,
 .ordi-checkout__itemmeta,
-.ordi-skinscent__notes > div {
+.ordi-featured__notes > div,
+.ordi-featured__tagline {
   font-weight: 500;
   letter-spacing: -0.01em;
   font-style: normal;
