@@ -9,9 +9,8 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import { products } from '@/lib/data/products'
 import { uiStrings, type UIStrings } from '@/lib/data/ui-strings'
-import type { Lang } from '@/types/product'
+import type { JournalEntry, Lang, Product } from '@/types/product'
 import type { CartItem } from '@/types/order'
 
 const CART_KEY = 'ordi.cart.v1'
@@ -19,10 +18,15 @@ const WISHLIST_KEY = 'ordi.wishlist.v1'
 const LANG_KEY = 'ordi.lang.v1'
 
 type AppContextValue = {
+  /** Catalogue fetched server-side in the root layout, shared by every view. */
+  products: Product[]
+  journal: JournalEntry[]
+
   cart: CartItem[]
   addToCart: (id: string, size: number) => void
   setQty: (id: string, size: number, qty: number) => void
   removeFromCart: (id: string, size: number) => void
+  clearCart: () => void
   cartCount: number
   subtotal: number
 
@@ -61,7 +65,13 @@ function writeStorage(key: string, value: unknown): void {
   }
 }
 
-export function AppProvider({ children }: { children: ReactNode }) {
+type AppProviderProps = {
+  children: ReactNode
+  products: Product[]
+  journal: JournalEntry[]
+}
+
+export function AppProvider({ children, products, journal }: AppProviderProps) {
   const [cart, setCart] = useState<CartItem[]>([])
   const [wishlist, setWishlist] = useState<string[]>([])
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -113,6 +123,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setCart((prev) => prev.filter((it) => !(it.id === id && it.size === size)))
   }, [])
 
+  const clearCart = useCallback(() => setCart([]), [])
+
   const toggleWishlist = useCallback((id: string) => {
     setWishlist((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
   }, [])
@@ -140,16 +152,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const s = p.sizes.find((x) => x.ml === it.size)
         return sum + (s ? s.price * it.qty : 0)
       }, 0),
-    [cart]
+    [cart, products]
   )
 
   const t = uiStrings[lang]
 
   const value: AppContextValue = {
+    products,
+    journal,
     cart,
     addToCart,
     setQty,
     removeFromCart,
+    clearCart,
     cartCount,
     subtotal,
     wishlist,

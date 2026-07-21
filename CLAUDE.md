@@ -28,378 +28,336 @@
 
 | Layer | Technology | Reason |
 |---|---|---|
+| Repo | npm workspaces | Two apps + one shared package, no Turborepo overhead |
 | Framework | Next.js 15 (App Router) | SSG for SEO, file routing, API routes |
 | Language | TypeScript | Type safety for products, orders, schemas |
 | Styling | Plain CSS (existing tokens) | Already designed, no Tailwind needed |
 | Database | Supabase PostgreSQL | Free tier, RLS, integrated auth |
-| Auth | Supabase Auth | Email/Password + Google + LINE OAuth |
+| Auth | Supabase Auth | Admins now; customer OAuth in Phase 5 |
 | Payment | Stripe Checkout (hosted) | International cards, no PCI burden |
-| Images | next/image + Cloudinary | Auto WebP, lazy loading |
+| CMS | The `admin/` dashboard | Products + journal live in Postgres, edited in-house |
+| Images | next/image + Supabase Storage | Brand art ships in the bundle as WebP; product shots upload from the dashboard |
 | Email | Resend (transactional) | Good Thai deliverability |
-| Hosting | Vercel | Zero-config Next.js, free tier |
-| Domain | Cloudflare Registrar | DNS + CDN + DDoS in one place |
+| Hosting | Vercel (4 projects) | prod + dev of each app, from one repo |
+| Domain | Vercel Registrar | Bought where it is served — no DNS records to keep in sync |
 
 ### What we are NOT using (yet)
-- ❌ PromptPay / Bank Transfer (future phase)
+- ❌ Bank transfer (PromptPay is a Stripe Dashboard toggle when wanted)
 - ❌ Kerry / Thai Post API integration (manual labels for now)
-- ❌ Sanity or other CMS (data lives in TypeScript modules)
+- ❌ Sanity or other third-party CMS (the admin dashboard replaces it)
 - ❌ Inventory management (manual stock tracking)
+- ❌ Customer accounts / OAuth (Phase 5 — guest checkout ships first)
 - ❌ Tailwind / shadcn (existing CSS works)
+- ❌ Turborepo (plain npm workspaces is enough at this size)
 
 ---
 
 ## 3. Project Structure
 
-The repo is split into two top-level workspaces: `front-end/` (Next.js app) and `back-end/` (reserved for any future server-side service — Supabase migrations, scripts, etc.). The Next.js app is self-contained inside `front-end/` — that's where you run `npm install`, `npm run dev`, and `npm run build`.
+An npm workspaces monorepo with four workspaces: two deployable Next.js apps
+(`front-end/` storefront, `admin/` dashboard), one shared library
+(`packages/shared/`) holding the domain types and every Supabase query, and
+`back-end/` for SQL migrations and operational scripts. Both apps talk to the
+same Supabase project; `@ordi/shared` is the only code they have in common.
 
 ```
-ORDI-Website/
-├── front-end/                    # Next.js app (this is where all npm commands run)
-│   ├── app/                      # Next.js App Router pages
+ORDI-Website/                     # npm workspaces root — run every command from here
+├── front-end/                    # ordi-web · storefront (port 3000)
+│   ├── app/
 │   │   ├── page.tsx              # Home
 │   │   ├── shop/
 │   │   │   ├── page.tsx          # Shop listing
 │   │   │   ├── layout.tsx        # Per-route metadata
-│   │   │   └── [slug]/page.tsx   # Product detail (SSG)
+│   │   │   └── [slug]/page.tsx   # Product detail (SSG + ISR from Supabase)
 │   │   ├── about/page.tsx
 │   │   ├── journal/page.tsx
+│   │   ├── journal/[slug]/page.tsx
 │   │   ├── membership/page.tsx
 │   │   ├── cart/page.tsx
-│   │   ├── checkout/page.tsx
-│   │   ├── checkout/success/page.tsx
-│   │   ├── account/page.tsx
-│   │   ├── account/orders/page.tsx
-│   │   ├── auth/
-│   │   │   ├── login/page.tsx
-│   │   │   ├── register/page.tsx
-│   │   │   └── callback/route.ts # OAuth callback (Phase 2)
+│   │   ├── checkout/page.tsx             # 3-step flow → Stripe Checkout
+│   │   ├── checkout/success/page.tsx     # Post-payment receipt
+│   │   ├── account/page.tsx              # Mock until Phase 5 (customer auth)
 │   │   ├── api/
-│   │   │   ├── checkout/session/route.ts   # Stripe Checkout (Phase 3)
-│   │   │   ├── webhooks/stripe/route.ts    # Stripe webhook (Phase 3)
-│   │   │   └── newsletter/route.ts         # (Phase 4)
-│   │   ├── layout.tsx            # Root layout (Nav + Footer + AppProvider)
-│   │   ├── globals.css           # All styles
-│   │   ├── sitemap.ts
-│   │   ├── robots.ts
-│   │   └── not-found.tsx
+│   │   │   ├── checkout/session/route.ts # Creates order + Stripe session
+│   │   │   ├── webhooks/stripe/route.ts  # paid / expired / refunded
+│   │   │   └── revalidate/route.ts       # Called by the admin dashboard
+│   │   ├── layout.tsx            # Root layout — fetches the catalogue
+│   │   ├── globals.css
+│   │   ├── sitemap.ts / robots.ts / not-found.tsx
 │   │
 │   ├── components/
-│   │   ├── layout/               # Nav, Footer, CartDrawer
-│   │   ├── product/              # ProductDetail, SocialOrderButtons (Phase 4)
+│   │   ├── layout/               # Nav, Footer, CartDrawer, MobileMenu
+│   │   ├── product/              # ProductDetail
+│   │   ├── journal/              # JournalArticle
+│   │   ├── checkout/             # ClearCartOnMount
 │   │   └── ui/                   # MonoTag, SectionHead, Marquee, BottleSlot
 │   │
 │   ├── lib/
-│   │   ├── supabase/             # client.ts / server.ts / middleware (Phase 2)
-│   │   ├── stripe/               # client.ts / server.ts (Phase 3)
-│   │   ├── data/                 # products.ts, journal.ts, ui-strings.ts
+│   │   ├── stripe/server.ts      # Lazy Stripe client
+│   │   ├── email/                # Resend order confirmation
+│   │   ├── data/catalog.ts       # Supabase reads + seed fallback
+│   │   ├── data/ui-strings.ts    # EN/TH dictionaries
+│   │   ├── data/product-images.ts
 │   │   ├── context/AppContext.tsx
-│   │   └── utils.ts              # cn(), formatPrice(), isDarkHue()
+│   │   ├── shipping.ts           # Server-authoritative carrier rates
+│   │   └── utils.ts
 │   │
-│   ├── types/                    # product.ts, order.ts, user.ts
-│   ├── public/images/products/   # Product photography
-│   ├── _legacy/                  # Frozen Phase 0 React + CDN prototype
-│   │
-│   ├── middleware.ts             # Next.js middleware (Supabase session, Phase 2)
-│   ├── next.config.ts
-│   ├── tsconfig.json
-│   ├── package.json
-│   ├── .env.local                # NEVER commit
-│   └── .env.example              # Template for env vars
+│   ├── types/                    # Thin re-exports of @ordi/shared
+│   └── _legacy/                  # Frozen Phase 0 prototype
 │
-├── back-end/                     # Reserved for future server-side code
-│   └── supabase/                 # SQL migrations (added in Phase 2)
+├── admin/                        # ordi-admin · dashboard (port 3001)
+│   ├── app/
+│   │   ├── login/page.tsx        # Email + password (Supabase Auth)
+│   │   ├── auth/signout/route.ts
+│   │   └── (dashboard)/
+│   │       ├── layout.tsx        # requireAdmin() gate + sidebar
+│   │       ├── page.tsx          # Sales stats, chart, best sellers
+│   │       ├── orders/           # List, filters, detail, fulfilment
+│   │       ├── products/         # List, create, edit, delete
+│   │       └── journal/          # List, create, edit, delete
+│   ├── components/               # Sidebar, forms, StatCard, RevenueChart
+│   ├── lib/
+│   │   ├── supabase/             # Cookie-backed SSR clients
+│   │   ├── auth.ts               # requireAdmin()
+│   │   ├── actions/              # Server actions (orders, products, journal)
+│   │   └── revalidate.ts         # Pings the storefront after a content edit
+│   └── middleware.ts             # Session refresh + anonymous redirect
 │
-├── CLAUDE.md                     # This file
-├── Project-dev.md                # Phase tracking
-├── README.md
+├── packages/shared/              # @ordi/shared · the contract between the apps
+│   └── src/
+│       ├── types/                # product, order, user, database
+│       ├── queries/              # products, journal, orders, stats
+│       ├── seed/                 # Original catalogue (seed + offline fallback)
+│       ├── mappers.ts            # DB rows ⇄ domain types
+│       ├── supabase.ts           # createAdminClient / createPublicClient
+│       └── utils.ts              # formatPrice, generateOrderId, slugify…
+│
+├── back-end/                     # ordi-backend · SQL + operational scripts
+│   ├── supabase/migrations/      # 0001_core_schema, 0002_content_schema
+│   └── scripts/                  # seed.ts, make-admin.ts
+│
+├── package.json                  # Workspaces + top-level scripts
+├── CLAUDE.md / Project-dev.md / README.md
 └── .gitignore
 ```
 
-**Working directory note:** `package.json` lives at `front-end/package.json`. Always run npm commands from inside `front-end/` (or use `npm --prefix front-end <cmd>` from the repo root).
+**Working directory note:** this is an npm workspaces monorepo. Run everything
+from the repo root:
+
+| Command | What it does |
+|---|---|
+| `npm install` | Installs all workspaces |
+| `npm run dev` | Storefront on :3000 |
+| `npm run dev:admin` | Dashboard on :3001 |
+| `npm run build:all` | Builds both apps |
+| `npm run type-check` | tsc across every workspace |
+| `npm run seed` | Pushes the seed catalogue into Supabase |
+| `npm run make-admin -- you@email.com` | Grants dashboard access |
+
+`@ordi/shared` ships raw TypeScript and is compiled by each app through
+`transpilePackages` — there is no build step to remember.
 
 ---
 
 ## 4. Routing Map
 
+### Storefront — `front-end/` (ordibkk.com)
+
 | URL | Purpose | Render |
 |---|---|---|
 | `/` | Home | SSG |
 | `/shop` | Product listing | SSG |
-| `/shop/[slug]` | Product detail (e.g. `/shop/good-boy`) | SSG |
+| `/shop/[slug]` | Product detail | SSG + ISR (1h, on-demand) |
 | `/about` | Brand story | SSG |
 | `/journal` | Journal index | SSG |
-| `/journal/[slug]` | Journal post (Phase 2) | SSG |
+| `/journal/[slug]` | Journal post | SSG + ISR (1h, on-demand) |
 | `/membership` | Tier overview | SSG |
 | `/cart` | Cart page | CSR |
-| `/checkout` | Checkout flow | SSR |
-| `/checkout/success` | Post-payment | SSR |
-| `/account` | Member dashboard | SSR (auth required) |
-| `/account/orders` | Order history | SSR (auth required) |
-| `/auth/login` | Sign in | CSR |
-| `/auth/register` | Sign up | CSR |
+| `/checkout` | 3-step checkout → Stripe | CSR |
+| `/checkout/success` | Post-payment receipt | SSR (dynamic) |
+| `/account` | Member dashboard | CSR (mock until Phase 5) |
+| `/api/checkout/session` | Creates the order + Stripe session | Route handler |
+| `/api/webhooks/stripe` | Payment lifecycle | Route handler |
+| `/api/revalidate` | Bearer-token ISR purge | Route handler |
+
+### Dashboard — `admin/` (admin.ordibkk.com)
+
+| URL | Purpose |
+|---|---|
+| `/login` | Email + password sign-in |
+| `/` | Revenue, AOV, unshipped count, 30-day chart, best sellers |
+| `/orders` | Filter by status, search by id/email, paginated |
+| `/orders/[id]` | Items, address, timeline, status + tracking editor |
+| `/products` | Catalogue list with publish state |
+| `/products/new`, `/products/[id]` | Bilingual editor with sizes/pricing |
+| `/journal` | Entry list |
+| `/journal/new`, `/journal/[id]` | Bilingual article editor |
+
+Every dashboard route below `(dashboard)/` runs `requireAdmin()`; middleware
+additionally bounces anonymous visitors to `/login`.
 
 ### Locale Strategy
-- Default locale: `en`
-- Secondary: `th`
-- Use `next-intl` or URL prefix `/th/...` (decide in Phase 1)
-- All content strings live in `lib/data/ui-strings.ts`
+- Default locale: `en`, secondary `th`
+- Client-side switch via React Context + localStorage (no URL prefix)
+- UI chrome lives in `lib/data/ui-strings.ts`; product and journal copy is
+  stored bilingually in Supabase and edited from the dashboard
 
 ---
 
 ## 5. Database Schema (Supabase)
 
-```sql
--- ============================================================
--- USER PROFILES (extends auth.users)
--- ============================================================
-create table profiles (
-  id              uuid primary key references auth.users on delete cascade,
-  first_name      text,
-  last_name       text,
-  phone           text,
-  preferred_lang  text default 'en' check (preferred_lang in ('en', 'th')),
-  is_invited      boolean default false,  -- "Out of Ordinary" tier
-  created_at      timestamptz default now(),
-  updated_at      timestamptz default now()
-);
+**Source of truth: `back-end/supabase/migrations/`.** Run them in order in the
+Supabase SQL Editor (or `supabase db push`). Do not hand-edit tables in the
+Dashboard — add a migration instead.
 
-alter table profiles enable row level security;
+| Migration | Contents |
+|---|---|
+| `0001_core_schema.sql` | `profiles` (with `role`), `orders`, `order_items`, `shipping_addresses`, `wishlists`, `newsletter_subscribers`, `member_tiers` view, `is_admin()`, signup trigger |
+| `0002_content_schema.sql` | `products`, `product_sizes`, `journal_entries` + their RLS |
+| `0003_product_featured.sql` | `products.featured` — the home-page spotlight flag |
+| `0004_cloud_fon_launch.sql` | Data only — N°05 goes on sale, hue follows its art |
+| `0005_product_image_storage.sql` | `product-images` bucket + its storage policies |
 
-create policy "Users can view own profile"
-  on profiles for select using (auth.uid() = id);
+### Content tables
 
-create policy "Users can update own profile"
-  on profiles for update using (auth.uid() = id);
+Product and journal copy used to live in `front-end/lib/data/*.ts`. It now lives
+in Postgres so the dashboard can edit it. Bilingual fields are stored as paired
+`_en` / `_th` columns (not jsonb) so admin forms map 1:1 to columns. Sizes are a
+separate `product_sizes` table — a product's prices change independently of its
+copy.
 
--- Auto-create profile on signup
-create function handle_new_user()
-returns trigger as $$
-begin
-  insert into profiles (id) values (new.id);
-  return new;
-end;
-$$ language plpgsql security definer;
+`packages/shared/src/seed/` still holds the original catalogue. It is used by
+`npm run seed`, and as the storefront's fallback when Supabase env vars are
+absent, so `npm run build` works before the project exists.
 
-create trigger on_auth_user_created
-  after insert on auth.users
-  for each row execute function handle_new_user();
+### Roles
 
--- ============================================================
--- ORDERS
--- ============================================================
-create table orders (
-  id                text primary key,           -- e.g. "ORDI-48201"
-  user_id           uuid references auth.users on delete set null,
-  email             text not null,              -- guest checkout support
-  status            text not null default 'pending_payment'
-                    check (status in ('pending_payment', 'paid', 'processing',
-                                       'shipped', 'delivered', 'cancelled', 'refunded')),
-  stripe_session_id text unique,
-  stripe_payment_id text,
-  payment_method    text,                       -- 'card' | 'promptpay' | 'transfer'
-  subtotal          integer not null,           -- THB, no decimals
-  shipping_cost     integer not null default 0,
-  total             integer not null,
-  currency          text not null default 'THB',
-  carrier           text,                       -- 'thai-post' | 'kerry' | 'pickup'
-  tracking_number   text,
-  notes             text,
-  created_at        timestamptz default now(),
-  paid_at           timestamptz,
-  shipped_at        timestamptz,
-  delivered_at      timestamptz
-);
+`profiles.role` is one of `customer` (default) · `admin` · `owner`. The
+`is_admin()` SECURITY DEFINER function backs every admin RLS policy — defined
+that way so the lookup is not itself subject to `profiles` RLS, which would
+recurse.
 
-alter table orders enable row level security;
+Grant access with:
 
-create policy "Users can view own orders"
-  on orders for select using (auth.uid() = user_id);
-
-create index orders_user_id_idx on orders(user_id);
-create index orders_status_idx on orders(status);
-
--- ============================================================
--- ORDER ITEMS
--- ============================================================
-create table order_items (
-  id          uuid primary key default gen_random_uuid(),
-  order_id    text not null references orders on delete cascade,
-  product_id  text not null,                    -- 'good-boy', 'hot-dilf', etc.
-  product_name text not null,                   -- snapshot at order time
-  size_ml     integer not null,
-  qty         integer not null check (qty > 0),
-  unit_price  integer not null,
-  created_at  timestamptz default now()
-);
-
-create index order_items_order_id_idx on order_items(order_id);
-
--- ============================================================
--- SHIPPING ADDRESSES
--- ============================================================
-create table shipping_addresses (
-  id          uuid primary key default gen_random_uuid(),
-  order_id    text not null references orders on delete cascade,
-  first_name  text not null,
-  last_name   text not null,
-  phone       text not null,
-  address     text not null,
-  city        text not null,
-  postcode    text not null,
-  country     text not null default 'TH',
-  created_at  timestamptz default now()
-);
-
--- ============================================================
--- WISHLIST
--- ============================================================
-create table wishlists (
-  user_id     uuid references auth.users on delete cascade,
-  product_id  text not null,
-  created_at  timestamptz default now(),
-  primary key (user_id, product_id)
-);
-
-alter table wishlists enable row level security;
-
-create policy "Users manage own wishlist"
-  on wishlists for all using (auth.uid() = user_id);
-
--- ============================================================
--- NEWSLETTER
--- ============================================================
-create table newsletter_subscribers (
-  email          text primary key,
-  lang           text default 'en' check (lang in ('en', 'th')),
-  subscribed_at  timestamptz default now(),
-  active         boolean default true
-);
-
--- ============================================================
--- MEMBER TIER (computed view)
--- ============================================================
-create view member_tiers as
-select
-  p.id as user_id,
-  p.is_invited,
-  count(o.id) filter (where o.status in ('paid', 'processing', 'shipped', 'delivered')) as completed_orders,
-  case
-    when p.is_invited then 'out_of_ordinary'
-    when count(o.id) filter (where o.status in ('paid', 'processing', 'shipped', 'delivered')) >= 3 then 'ous'
-    else 'ordinary'
-  end as tier
-from profiles p
-left join orders o on o.user_id = p.id
-group by p.id, p.is_invited;
+```bash
+npm run make-admin -- you@email.com          # owner
+npm run make-admin -- teammate@email.com admin
 ```
+
+The user must already exist in Supabase Auth.
+
+### Who writes what
+
+| Table | Anon read | Customer | Admin | service_role |
+|---|---|---|---|---|
+| `products` / `product_sizes` / `journal_entries` | published rows | — | full | full |
+| `orders` / `order_items` / `shipping_addresses` | — | own rows (read) | full | insert + update |
+| `profiles` | — | own row | read all, update all | full |
+| `wishlists` | — | own rows | — | full |
+
+Orders have **no INSERT policy** on purpose: only the checkout API and the
+Stripe webhook write them, both using the service_role key. No browser client
+can forge an order.
 
 ---
 
 ## 6. Authentication Flow
 
-### Providers
-1. **Email + Password** — Supabase native
-2. **Google OAuth** — via Supabase
-3. **LINE OAuth** — via Supabase (LINE Login channel)
+### Current state
 
-### Setup Requirements
+| Who | Method | Status |
+|---|---|---|
+| Shoppers | **Guest checkout** — email only, no account | Live |
+| Studio staff | Supabase Auth email + password, gated on `profiles.role` | Live |
+| Shoppers | Email/password + Google + LINE OAuth | Phase 5 (not built) |
 
-**Google OAuth:**
-- Google Cloud Console → Create OAuth 2.0 Client
-- Authorized redirect URI: `https://[project].supabase.co/auth/v1/callback`
-- Add Client ID + Secret to Supabase Dashboard
+Guest checkout came first on purpose: it unblocks revenue without waiting on
+Google Cloud and LINE Developers console setup. Orders store the buyer's email,
+so when customer accounts land they can be back-filled by matching on it.
 
-**LINE OAuth:**
-- LINE Developers Console → Create Provider + Channel (LINE Login)
-- Callback URL: `https://[project].supabase.co/auth/v1/callback`
-- Add Channel ID + Secret to Supabase Dashboard
+### Dashboard auth
 
-### Session Management
-- Use `@supabase/ssr` for Next.js (server + client cookies)
-- Middleware checks session on every request
-- Protected routes: `/account/*`, `/checkout/*`
-- Redirect to `/auth/login?redirect_to=/account` if unauthenticated
-
-### File Pattern
-```typescript
-// lib/supabase/server.ts — for RSC and API routes
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
-
-export async function createClient() {
-  const cookieStore = await cookies()
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() { return cookieStore.getAll() },
-        setAll(toSet) { toSet.forEach(c => cookieStore.set(c.name, c.value, c.options)) }
-      }
-    }
-  )
-}
 ```
+middleware.ts        refreshes the session cookie; anonymous → /login
+(dashboard)/layout   requireAdmin() → profiles.role must be admin|owner
+Server actions       call requireAdmin() again — never trust the layout alone
+RLS policies         is_admin() is the real enforcement boundary
+```
+
+`admin/lib/supabase/server.ts` uses `@supabase/ssr` with the **anon** key, so
+every dashboard query runs as that admin and RLS applies. A compromised
+dashboard session cannot exceed what its role allows.
+
+### Phase 5 — customer accounts (planned)
+
+**Google OAuth:** Google Cloud Console → OAuth 2.0 Client → redirect URI
+`https://[project].supabase.co/auth/v1/callback` → Client ID + Secret into the
+Supabase Dashboard.
+
+**LINE OAuth:** LINE Developers Console → Provider + LINE Login channel → same
+callback URL → scopes `profile`, `openid`, `email` → Channel ID + Secret into
+Supabase.
+
+Then: `/auth/login`, `/auth/register`, `/auth/callback`, a storefront
+`middleware.ts` protecting `/account/*`, and cart/wishlist sync on sign-in.
 
 ---
 
 ## 7. Payment Flow (Stripe Checkout)
 
 ### Why Stripe Checkout (not Elements)
-- Hosted page = zero PCI scope for us
-- Built-in fraud protection
-- Auto-handles 3D Secure
-- Mobile-optimized
-- Receipt emails included
+Hosted page = zero PCI scope, built-in fraud checks, automatic 3D Secure,
+mobile-optimised, receipt emails included.
 
-### Order Creation Flow
+### Order lifecycle
+
 ```
-1. User fills checkout form → clicks "Place Order"
-2. Frontend POST /api/checkout/session
-   Body: { items, email, shipping_address, carrier }
-3. API Route:
-   a. Generate order ID (e.g. "ORDI-48201")
-   b. Insert order to Supabase (status: 'pending_payment')
-   c. Insert order_items + shipping_address
-   d. Create Stripe Checkout Session
-   e. Return session URL
-4. Frontend redirects to Stripe Checkout
-5. User completes payment
-6. Stripe redirects to /checkout/success?session_id=...
-7. (Async) Stripe webhook → /api/webhooks/stripe
-   a. Verify signature
-   b. Update order status to 'paid'
-   c. Set paid_at timestamp
-   d. Send confirmation email via Resend
+1. Shopper completes /checkout (contact → shipping → review)
+2. POST /api/checkout/session
+     a. Re-prices every line from the catalogue — the request body only
+        chooses *what* to buy, never *what it costs*
+     b. Recomputes shipping from the carrier id (lib/shipping.ts)
+     c. Generates ORDI-#####, inserts order + items + address
+        (status: pending_payment)
+     d. Creates the Stripe Checkout Session, stores stripe_session_id
+     e. Returns { url }
+3. Browser redirects to Stripe
+4. Stripe → /checkout/success?session_id=…   (cart cleared here, not before)
+5. Stripe → POST /api/webhooks/stripe
+     checkout.session.completed → paid + paid_at + payment intent → Resend email
+     checkout.session.expired   → cancelled
+     charge.refunded            → refunded
 ```
 
-### Stripe Session Config
-```typescript
-const session = await stripe.checkout.sessions.create({
-  mode: 'payment',
-  payment_method_types: ['card'],
-  line_items: items.map(it => ({
-    price_data: {
-      currency: 'thb',
-      product_data: { name: it.product_name },
-      unit_amount: it.unit_price * 100,  // Stripe uses smallest unit
-    },
-    quantity: it.qty,
-  })),
-  customer_email: email,
-  metadata: { order_id: orderId },
-  success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-  cancel_url: `${origin}/checkout?cancelled=true`,
-  shipping_address_collection: { allowed_countries: ['TH', 'US', 'GB', 'JP', 'SG'] },
-})
+### Rules that matter
+
+- **Never trust posted prices.** The API rebuilds every line item from
+  Supabase and rejects unknown or unavailable products.
+- **The status guard is a `.eq('status', 'pending_payment')` on the update**, so
+  a duplicate or out-of-order webhook delivery cannot re-transition a shipped
+  order back to paid.
+- **Email failures never fail the webhook.** A non-2xx makes Stripe retry the
+  whole handler; a missed receipt is not worth that.
+- **Payment methods come from the Stripe Dashboard**, not code. Enabling
+  PromptPay is a Dashboard toggle, no deploy.
+- If Stripe session creation fails, the just-created order is marked
+  `cancelled` rather than left pending forever.
+
+### Local webhook testing
+
+```bash
+stripe listen --forward-to localhost:3000/api/webhooks/stripe
+# copy the whsec_… it prints into front-end/.env.local
+stripe trigger checkout.session.completed
 ```
 
-### Webhook Security
-- Verify `stripe-signature` header against `STRIPE_WEBHOOK_SECRET`
-- Handle these events:
-  - `checkout.session.completed` → mark order paid
-  - `checkout.session.expired` → mark order cancelled
-  - `charge.refunded` → mark order refunded
+Test card: `4242 4242 4242 4242`, any future expiry, any CVC.
+
+### Production webhook
+
+Stripe Dashboard → Developers → Webhooks → `https://ordibkk.com/api/webhooks/stripe`
+with `checkout.session.completed`, `checkout.session.expired`,
+`charge.refunded`. Copy the signing secret into Vercel env vars.
 
 ---
 
@@ -441,36 +399,147 @@ const messages = {
 
 ## 9. Environment Variables
 
-```bash
-# .env.local — NEVER commit
+### Where each environment lives
 
-# Supabase
+Four Vercel projects, two Supabase projects. The split is deliberate: the
+production database is only ever reachable from things named `ordi-web` /
+`ordi-admin`, so "which environment am I looking at" is answerable from the URL
+alone rather than by auditing env vars.
+
+| Vercel project | Root | URL | Supabase | Stripe |
+|---|---|---|---|---|
+| `ordi-web` | `front-end/` | ordibkk.com | ordi-website (prod) | test until launch |
+| `ordi-admin` | `admin/` | admin.ordibkk.com | ordi-website (prod) | — |
+| `ordi-dev-web` | `front-end/` | ordi-dev-web.vercel.app | ordi-dev | test |
+| `ordi-dev-admin` | `admin/` | ordi-dev-admin.vercel.app | ordi-dev | — |
+
+`REVALIDATE_SECRET` is different per environment on purpose — a dev dashboard
+must not be able to purge the production storefront's cache.
+
+Vercel marks Production env vars **sensitive** by default, so `vercel env pull`
+returns them empty. That is expected; it does not mean the value is missing.
+Add them with `vercel env add KEY production --value …` — piping the value to
+stdin silently stores an empty string.
+
+`ordi-website-skfn` is the frozen Phase 0 demo. It has no env vars, runs off the
+seed catalogue, and has been disconnected from GitHub so it never rebuilds.
+
+### Local files
+
+Two `.env.local` files, one per app. Templates live beside them as
+`.env.example`. Never commit either.
+
+### `front-end/.env.local`
+
+```bash
+# Supabase — falls back to the seed catalogue when absent
 NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJxxx
-SUPABASE_SERVICE_ROLE_KEY=eyJxxx  # server-only, bypass RLS
+SUPABASE_SERVICE_ROLE_KEY=eyJxxx        # server-only; required for checkout
 
 # Stripe
 STRIPE_SECRET_KEY=sk_test_xxx
 STRIPE_WEBHOOK_SECRET=whsec_xxx
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_xxx
 
-# Resend (email)
+# Resend — optional; emails are skipped when unset
 RESEND_API_KEY=re_xxx
-RESEND_FROM_EMAIL=orders@ordi.com
+RESEND_FROM_EMAIL=orders@ordibkk.com
 
-# Social
+# Shared with the dashboard — openssl rand -hex 32
+REVALIDATE_SECRET=
+
+# Social (Phase 6)
 NEXT_PUBLIC_LINE_OA_ID=@ordi
 NEXT_PUBLIC_INSTAGRAM_HANDLE=ordi.atelier
 NEXT_PUBLIC_SHOPEE_SHOP=ordi
 NEXT_PUBLIC_TIKTOK_HANDLE=ordi
 
-# Site
-NEXT_PUBLIC_SITE_URL=https://ordi.com
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+### `admin/.env.local`
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJxxx
+
+STOREFRONT_URL=http://localhost:3000
+REVALIDATE_SECRET=                      # must match the storefront exactly
+```
+
+The dashboard deliberately has **no** service_role key: it reads and writes as
+the signed-in admin so RLS — not application code — is what enforces access.
+
+`back-end/` scripts reuse whichever `.env.local` they find first
+(`back-end/` → `front-end/` → repo root).
+
+---
+
+## 10. Admin Dashboard
+
+A second Next.js app in `admin/`, deployed as its own Vercel project pointed at
+`admin.ordibkk.com`. It shares the Supabase project and `@ordi/shared` with the
+storefront, and nothing else — dashboard code never ships in the customer
+bundle.
+
+### What it does
+
+| Area | Capability |
+|---|---|
+| Dashboard | 30-day revenue, AOV, units, unpaid + unshipped counts, daily bar chart, best sellers |
+| Orders | Filter by status, search by id/email, paginate; open an order to see items, address, payment ids and timeline |
+| Fulfilment | Change status, set carrier + tracking number, leave an internal note |
+| Products | Create, edit, delete; bilingual copy, notes, hue, image upload, publish toggle, featured toggle, sort order, per-size pricing |
+| Journal | Create, edit, delete; bilingual title/excerpt/body, slug, publish toggle, auto read-time |
+
+### Content → storefront propagation
+
+Storefront product and journal pages are statically generated with
+`revalidate = 3600`. On every save the dashboard also calls
+`POST {STOREFRONT_URL}/api/revalidate` with a bearer `REVALIDATE_SECRET` and the
+affected paths, so edits appear immediately instead of within the hour.
+
+The call is deliberately **non-fatal**: the row is already committed and the
+hourly revalidate is the backstop, so a failed ping logs and moves on rather
+than turning a successful save into an error.
+
+### Where images live
+
+Two homes, split by who changes them — not by file type:
+
+| Art | Home | Why |
+|---|---|---|
+| Brand + editorial (hero, journal, campaign plates) | `front-end/assets/**` as WebP, imported statically | Changes only with the design. Static imports give `next/image` build-time dimensions and a blur placeholder for free |
+| Product photography | `product-images` bucket in Supabase Storage → `products.image_url` | The studio replaces a bottle shot from the dashboard without a deploy |
+
+Uploads go browser → Storage directly (`uploadProductImage()` in `@ordi/shared`),
+never through a server action, so an image never travels in a Next request body.
+The bucket policies in migration 0005 are the access boundary.
+
+`getProductImage()` prefers `image_url` and falls back to the bundled art, so a
+fragrance with no upload still renders. Keep bundled art as WebP — the repo
+carried 35 MB of PNG before the conversion and now carries 4 MB.
+
+### Writing new dashboard features
+
+- Server actions live in `admin/lib/actions/` and **must** call `requireAdmin()`
+  first — the layout gate is not enough on its own.
+- Query helpers belong in `packages/shared/src/queries/`, taking a
+  `SupabaseClient<Database>` argument so both apps can reuse them.
+- Never add `SUPABASE_SERVICE_ROLE_KEY` to the admin app. If a query needs it,
+  that is a signal the RLS policy is wrong.
+
+### Local development
+
+```bash
+npm run dev         # storefront  :3000
+npm run dev:admin   # dashboard   :3001
 ```
 
 ---
 
-## 10. Coding Conventions
+## 11. Coding Conventions
 
 ### TypeScript
 - `strict: true` in tsconfig
@@ -506,7 +575,7 @@ NEXT_PUBLIC_SITE_URL=https://ordi.com
 
 ---
 
-## 11. Design Tokens (Existing — DO NOT CHANGE)
+## 12. Design Tokens (Existing — DO NOT CHANGE)
 
 ```css
 :root {
@@ -526,7 +595,7 @@ These tokens are sacred — preserved from the design prototype.
 
 ---
 
-## 12. Migration Notes from Prototype
+## 13. Migration Notes from Prototype
 
 The frontend in `/frontend/` is a working React + CDN prototype.
 When migrating to Next.js, preserve:
@@ -544,7 +613,7 @@ Replace:
 
 ---
 
-## 13. Quick Reference Links
+## 14. Quick Reference Links
 
 - Supabase Docs: https://supabase.com/docs
 - Next.js App Router: https://nextjs.org/docs/app

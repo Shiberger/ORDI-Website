@@ -1,14 +1,12 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useApp } from '@/lib/context/AppContext'
-import { products } from '@/lib/data/products'
 import { MonoTag } from '@/components/ui/MonoTag'
 import { cn, formatPrice } from '@/lib/utils'
-
-type Carrier = 'thai-post' | 'kerry' | 'pickup'
-type Payment = 'card' | 'promptpay' | 'transfer'
+import { SHIPPING_RATES } from '@/lib/shipping'
+import type { Carrier } from '@/types/order'
 
 type FormState = {
   email: string
@@ -19,13 +17,14 @@ type FormState = {
   postcode: string
   phone: string
   method: Carrier
-  payment: Payment
 }
 
 export default function CheckoutPage() {
-  const { cart, subtotal, t, lang } = useApp()
+  const { cart, subtotal, t, lang, products } = useApp()
   const [step, setStep] = useState<1 | 2 | 3>(1)
-  const [done, setDone] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [cancelled, setCancelled] = useState(false)
   const [form, setForm] = useState<FormState>({
     email: '',
     first: '',
@@ -35,52 +34,64 @@ export default function CheckoutPage() {
     postcode: '',
     phone: '',
     method: 'thai-post',
-    payment: 'card',
   })
+
+  // Stripe sends the shopper back to /checkout?cancelled=1. Read it from the
+  // URL directly so the page needs no Suspense boundary.
+  useEffect(() => {
+    setCancelled(new URLSearchParams(window.location.search).has('cancelled'))
+  }, [])
+
   const upd = <K extends keyof FormState>(k: K, v: FormState[K]) =>
     setForm((f) => ({ ...f, [k]: v }))
 
-  const ship = form.method === 'kerry' ? 80 : form.method === 'thai-post' ? 50 : 0
+  const ship = SHIPPING_RATES[form.method]
   const total = subtotal + ship
 
-  if (done) {
-    return (
-      <main className="ordi-checkout ordi-checkout--done">
-        <div className="ordi-thanks">
-          <MonoTag>
-            ORDER · ORDI-{String(Math.floor(Math.random() * 90000) + 10000)}
-          </MonoTag>
-          <h1 className="ordi-display-lg">
-            {lang === 'en' ? (
-              <span>
-                Thank <em>you</em>.
-              </span>
-            ) : (
-              <span>
-                <em>ขอบคุณ</em>.
-              </span>
-            )}
-          </h1>
-          <p>
-            {lang === 'en'
-              ? "We'll hand-bottle your order in the studio this week. A confirmation is on its way to your inbox."
-              : 'เราจะบรรจุคำสั่งซื้อของคุณด้วยมือในสตูดิโอภายในสัปดาห์นี้ อีเมลยืนยันกำลังจะส่งถึง'}
-          </p>
-          <div className="ordi-thanks__meta">
-            <div>
-              <MonoTag>EST. ARRIVAL</MonoTag>
-              {lang === 'en' ? '3–5 business days' : '3–5 วันทำการ'}
-            </div>
-            <div>
-              <MonoTag>FROM</MonoTag>Sukhumvit Studio, Bangkok
-            </div>
-          </div>
-          <Link href="/" className="ordi-btn ordi-btn--ghost">
-            ← Back to ORDI
-          </Link>
-        </div>
-      </main>
-    )
+  const contactValid =
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim()) &&
+    form.first.trim() !== '' &&
+    form.last.trim() !== '' &&
+    form.phone.trim() !== ''
+
+  const shippingValid =
+    form.method === 'pickup' ||
+    (form.address.trim() !== '' && form.city.trim() !== '' && form.postcode.trim() !== '')
+
+  async function placeOrder() {
+    setError(null)
+    setSubmitting(true)
+    try {
+      const res = await fetch('/api/checkout/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: cart,
+          email: form.email.trim(),
+          carrier: form.method,
+          shipping_address: {
+            first_name: form.first.trim(),
+            last_name: form.last.trim(),
+            phone: form.phone.trim(),
+            address: form.address.trim(),
+            city: form.city.trim(),
+            postcode: form.postcode.trim(),
+            country: 'TH',
+          },
+        }),
+      })
+
+      const data = (await res.json()) as { url?: string; error?: string }
+      if (!res.ok || !data.url) {
+        throw new Error(data.error ?? 'Could not start checkout.')
+      }
+      // The cart is cleared on /checkout/success, not here — a shopper who
+      // abandons the Stripe page must come back to a full cart.
+      window.location.assign(data.url)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong.')
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -91,50 +102,52 @@ export default function CheckoutPage() {
           Almost <em>yours</em>.
         </h1>
         <ol className="ordi-checkout__steps">
-          {['Contact', lang === 'en' ? 'Shipping' : 'การจัดส่ง', lang === 'en' ? 'Payment' : 'การชำระเงิน'].map(
-            (s, i) => (
-              <li
-                key={i}
-                className={cn(
-                  step === i + 1 && 'is-active',
-                  step > i + 1 && 'is-done'
-                )}
-              >
-                <span>0{i + 1}</span>
-                <span>{s}</span>
-              </li>
-            )
-          )}
+          {[
+            lang === 'en' ? 'Contact' : 'ติดต่อ',
+            lang === 'en' ? 'Shipping' : 'การจัดส่ง',
+            lang === 'en' ? 'Review' : 'ตรวจสอบ',
+          ].map((s, i) => (
+            <li
+              key={i}
+              className={cn(step === i + 1 && 'is-active', step > i + 1 && 'is-done')}
+            >
+              <span>0{i + 1}</span>
+              <span>{s}</span>
+            </li>
+          ))}
         </ol>
       </header>
+
+      {cancelled && (
+        <p className="ordi-checkout__notice">
+          {lang === 'en'
+            ? 'Payment was cancelled. Your cart is untouched — you can try again.'
+            : 'การชำระเงินถูกยกเลิก ตะกร้าของคุณยังอยู่ครบ ลองใหม่ได้เลย'}
+        </p>
+      )}
 
       <div className="ordi-checkout__grid">
         <div className="ordi-checkout__form">
           {step === 1 && (
             <section className="ordi-formstep">
-              <h2>01 — Contact</h2>
+              <h2>01 — {lang === 'en' ? 'Contact' : 'ติดต่อ'}</h2>
               <label>
                 <span>{lang === 'en' ? 'Email' : 'อีเมล'}</span>
                 <input
+                  type="email"
                   value={form.email}
                   onChange={(e) => upd('email', e.target.value)}
-                  placeholder="you@email"
+                  placeholder="you@email.com"
                 />
               </label>
               <div className="ordi-form-row">
                 <label>
                   <span>{lang === 'en' ? 'First name' : 'ชื่อ'}</span>
-                  <input
-                    value={form.first}
-                    onChange={(e) => upd('first', e.target.value)}
-                  />
+                  <input value={form.first} onChange={(e) => upd('first', e.target.value)} />
                 </label>
                 <label>
                   <span>{lang === 'en' ? 'Last name' : 'นามสกุล'}</span>
-                  <input
-                    value={form.last}
-                    onChange={(e) => upd('last', e.target.value)}
-                  />
+                  <input value={form.last} onChange={(e) => upd('last', e.target.value)} />
                 </label>
               </div>
               <label>
@@ -147,44 +160,23 @@ export default function CheckoutPage() {
               </label>
               <button
                 className="ordi-btn ordi-btn--primary"
+                disabled={!contactValid}
                 onClick={() => setStep(2)}
               >
                 {t.cta.continue} →
               </button>
             </section>
           )}
+
           {step === 2 && (
             <section className="ordi-formstep">
               <h2>02 — {lang === 'en' ? 'Shipping' : 'การจัดส่ง'}</h2>
-              <label>
-                <span>{lang === 'en' ? 'Address' : 'ที่อยู่'}</span>
-                <input
-                  value={form.address}
-                  onChange={(e) => upd('address', e.target.value)}
-                />
-              </label>
-              <div className="ordi-form-row">
-                <label>
-                  <span>{lang === 'en' ? 'City' : 'เมือง'}</span>
-                  <input
-                    value={form.city}
-                    onChange={(e) => upd('city', e.target.value)}
-                  />
-                </label>
-                <label>
-                  <span>{lang === 'en' ? 'Postcode' : 'รหัสไปรษณีย์'}</span>
-                  <input
-                    value={form.postcode}
-                    onChange={(e) => upd('postcode', e.target.value)}
-                  />
-                </label>
-              </div>
               <fieldset className="ordi-radiogroup">
                 <legend>{lang === 'en' ? 'Carrier' : 'ผู้ให้บริการ'}</legend>
                 {(
                   [
-                    { id: 'thai-post', label: 'Thai Post · 50 THB · 3-5 days' },
-                    { id: 'kerry', label: 'Kerry Express · 80 THB · 1-2 days' },
+                    { id: 'thai-post', label: 'Thai Post · 50 THB · 3–5 days' },
+                    { id: 'kerry', label: 'Kerry Express · 80 THB · 1–2 days' },
                     {
                       id: 'pickup',
                       label:
@@ -209,15 +201,39 @@ export default function CheckoutPage() {
                   </label>
                 ))}
               </fieldset>
+
+              {form.method !== 'pickup' && (
+                <>
+                  <label>
+                    <span>{lang === 'en' ? 'Address' : 'ที่อยู่'}</span>
+                    <input
+                      value={form.address}
+                      onChange={(e) => upd('address', e.target.value)}
+                    />
+                  </label>
+                  <div className="ordi-form-row">
+                    <label>
+                      <span>{lang === 'en' ? 'City' : 'เมือง'}</span>
+                      <input value={form.city} onChange={(e) => upd('city', e.target.value)} />
+                    </label>
+                    <label>
+                      <span>{lang === 'en' ? 'Postcode' : 'รหัสไปรษณีย์'}</span>
+                      <input
+                        value={form.postcode}
+                        onChange={(e) => upd('postcode', e.target.value)}
+                      />
+                    </label>
+                  </div>
+                </>
+              )}
+
               <div className="ordi-formstep__actions">
-                <button
-                  className="ordi-btn ordi-btn--ghost"
-                  onClick={() => setStep(1)}
-                >
+                <button className="ordi-btn ordi-btn--ghost" onClick={() => setStep(1)}>
                   ← Back
                 </button>
                 <button
                   className="ordi-btn ordi-btn--primary"
+                  disabled={!shippingValid}
                   onClick={() => setStep(3)}
                 >
                   {t.cta.continue} →
@@ -225,84 +241,66 @@ export default function CheckoutPage() {
               </div>
             </section>
           )}
+
           {step === 3 && (
             <section className="ordi-formstep">
-              <h2>03 — {lang === 'en' ? 'Payment' : 'การชำระเงิน'}</h2>
-              <fieldset className="ordi-radiogroup">
-                {(
-                  [
-                    {
-                      id: 'card',
-                      label:
-                        lang === 'en' ? 'Credit / debit card' : 'บัตรเครดิต / เดบิต',
-                    },
-                    { id: 'promptpay', label: 'PromptPay QR' },
-                    {
-                      id: 'transfer',
-                      label:
-                        lang === 'en'
-                          ? 'Bank transfer (SCB · Kasikorn)'
-                          : 'โอนผ่านธนาคาร (SCB · กสิกร)',
-                    },
-                  ] as { id: Payment; label: string }[]
-                ).map((o) => (
-                  <label
-                    key={o.id}
-                    className={cn('ordi-radio', form.payment === o.id && 'is-checked')}
-                  >
-                    <input
-                      type="radio"
-                      name="payment"
-                      checked={form.payment === o.id}
-                      onChange={() => upd('payment', o.id)}
-                    />
-                    <span className="ordi-radio__dot"></span>
-                    <span>{o.label}</span>
-                  </label>
-                ))}
-              </fieldset>
-              {form.payment === 'card' && (
-                <>
-                  <label>
-                    <span>{lang === 'en' ? 'Card number' : 'หมายเลขบัตร'}</span>
-                    <input placeholder="•••• •••• •••• ••••" />
-                  </label>
-                  <div className="ordi-form-row">
-                    <label>
-                      <span>MM / YY</span>
-                      <input placeholder="MM / YY" />
-                    </label>
-                    <label>
-                      <span>CVC</span>
-                      <input placeholder="•••" />
-                    </label>
-                  </div>
-                </>
-              )}
-              {form.payment === 'promptpay' && (
-                <div className="ordi-pay-promptpay">
-                  <div className="ordi-pay-qr">
-                    <div className="ordi-pay-qr__inner"></div>
-                  </div>
-                  <p>
-                    {lang === 'en'
-                      ? 'Scan with any Thai banking app. Your order will be released once we see the transfer.'
-                      : 'สแกนด้วยแอปธนาคารใดก็ได้ คำสั่งซื้อจะถูกปล่อยเมื่อเราเห็นการโอน'}
-                  </p>
+              <h2>03 — {lang === 'en' ? 'Review' : 'ตรวจสอบ'}</h2>
+
+              <dl className="ordi-review">
+                <div>
+                  <dt>{lang === 'en' ? 'Email' : 'อีเมล'}</dt>
+                  <dd>{form.email}</dd>
                 </div>
-              )}
+                <div>
+                  <dt>{lang === 'en' ? 'Deliver to' : 'จัดส่งถึง'}</dt>
+                  <dd>
+                    {form.first} {form.last}
+                    <br />
+                    {form.method === 'pickup' ? (
+                      lang === 'en' ? (
+                        'Studio pickup — Sukhumvit, Bangkok'
+                      ) : (
+                        'รับที่สตูดิโอ — สุขุมวิท กรุงเทพฯ'
+                      )
+                    ) : (
+                      <>
+                        {form.address}
+                        <br />
+                        {form.city} {form.postcode}
+                      </>
+                    )}
+                    <br />
+                    {form.phone}
+                  </dd>
+                </div>
+              </dl>
+
+              <p className="ordi-checkout__securenote">
+                {lang === 'en'
+                  ? 'You will be redirected to Stripe to pay securely. We never see your card details.'
+                  : 'ระบบจะพาไปชำระเงินอย่างปลอดภัยที่ Stripe เราไม่เห็นข้อมูลบัตรของคุณ'}
+              </p>
+
+              {error && <p className="ordi-checkout__error">{error}</p>}
+
               <div className="ordi-formstep__actions">
                 <button
                   className="ordi-btn ordi-btn--ghost"
                   onClick={() => setStep(2)}
+                  disabled={submitting}
                 >
                   ← Back
                 </button>
                 <button
                   className="ordi-btn ordi-btn--primary"
-                  onClick={() => setDone(true)}
+                  onClick={placeOrder}
+                  disabled={submitting || cart.length === 0}
                 >
-                  {t.cta.place_order} — {formatPrice(total)} {t.currency}
+                  {submitting
+                    ? lang === 'en'
+                      ? 'Redirecting…'
+                      : 'กำลังไปหน้าชำระเงิน…'
+                    : `${t.cta.place_order} — ${formatPrice(total)} ${t.currency}`}
                 </button>
               </div>
             </section>
@@ -311,7 +309,11 @@ export default function CheckoutPage() {
 
         <aside className="ordi-checkout__summary">
           <MonoTag>↘ {lang === 'en' ? 'Your order' : 'คำสั่งซื้อของคุณ'}</MonoTag>
-          {cart.length === 0 && <p style={{ opacity: 0.6 }}>{t.empty_cart}</p>}
+          {cart.length === 0 && (
+            <p style={{ opacity: 0.6 }}>
+              {t.empty_cart} <Link href="/shop">{t.cta.shop_all}</Link>
+            </p>
+          )}
           {cart.map((it, i) => {
             const p = products.find((x) => x.id === it.id)
             if (!p) return null
@@ -342,11 +344,7 @@ export default function CheckoutPage() {
           <div className="ordi-summary__row">
             <span>{lang === 'en' ? 'Shipping' : 'จัดส่ง'}</span>
             <span>
-              {ship === 0
-                ? lang === 'en'
-                  ? 'Free'
-                  : 'ฟรี'
-                : `${ship} ${t.currency}`}
+              {ship === 0 ? (lang === 'en' ? 'Free' : 'ฟรี') : `${ship} ${t.currency}`}
             </span>
           </div>
           <div className="ordi-summary__row ordi-summary__row--total">

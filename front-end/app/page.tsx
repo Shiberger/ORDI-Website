@@ -6,24 +6,22 @@ import gsap from 'gsap'
 import { SplitText } from 'gsap/SplitText'
 import { useGSAP } from '@gsap/react'
 import { useApp } from '@/lib/context/AppContext'
-import { products } from '@/lib/data/products'
 import { getProductImage } from '@/lib/data/product-images'
-import { journal } from '@/lib/data/journal'
+import { FeaturedPerfume } from '@/components/product/FeaturedPerfume'
 import { MonoTag } from '@/components/ui/MonoTag'
 import { SectionHead } from '@/components/ui/SectionHead'
 import { Marquee } from '@/components/ui/Marquee'
 import { BottleSlot } from '@/components/ui/BottleSlot'
 import { formatPrice, isDarkHue } from '@/lib/utils'
-import CloudFonHero from '@/assets/journal/cloud-fon_feature_article.png'
-
 
 gsap.registerPlugin(SplitText)
 
 export default function HomePage() {
-  const { t, lang } = useApp()
+  const { t, lang, products, journal } = useApp()
   const featured = products.slice(0, 4)
-  const skin = products.find((p) => p.id === 'cloud-fon')
-  const cloudFon = journal.find((j) => j.slug === 'cloud-fon-scent-of-air')
+  // The dashboard flag wins; fall back to the first fragrance so the spotlight
+  // is never empty on a catalogue where nobody has picked one yet.
+  const spotlight = products.find((p) => p.featured) ?? products[0]
   const mainRef = useRef<HTMLElement>(null)
 
   useGSAP(
@@ -120,6 +118,9 @@ export default function HomePage() {
         speed={45}
       />
 
+      {/* FEATURED PERFUME */}
+      {spotlight && <FeaturedPerfume product={spotlight} />}
+
       {/* COLLECTION GRID */}
       <section className="ordi-section ordi-collection" data-reveal>
         <SectionHead
@@ -151,7 +152,7 @@ export default function HomePage() {
             <Link className="ordi-pcard" key={p.id} href={`/shop/${p.id}`}>
               <div className="ordi-pcard__media" style={{ background: p.hue }}>
                 <BottleSlot
-                  image={getProductImage(p.id)}
+                  image={getProductImage(p)}
                   placeholder={`${p.name} — bottle on ${isDarkHue(p.hue) ? 'dark' : 'neutral'} backdrop`}
                   alt={`${p.name} ${p.number} — eau de parfum`}
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
@@ -178,61 +179,6 @@ export default function HomePage() {
           ))}
         </div>
       </section>
-
-      {/* CLOUD FON — N°05 TEASE */}
-      {skin && (
-        <section className="ordi-skinscent" data-reveal>
-          <div className="ordi-skinscent__grid">
-            <div className="ordi-skinscent__media">
-              <BottleSlot
-                image={CloudFonHero}
-                placeholder="CLOUD FON — moody close-up of skin / fabric"
-                alt={
-                  lang === 'en'
-                    ? "CLOUD FON — the scent of air that hasn't dried yet"
-                    : 'เคล้าฝน กลิ่นของอากาศที่ยังไม่แห้ง'
-                }
-                sizes="(max-width: 768px) 100vw, 680px"
-                quality={92}
-              />
-              <div className="ordi-skinscent__chip">{t.coming_soon.toUpperCase()}</div>
-            </div>
-            <div className="ordi-skinscent__copy">
-              <MonoTag>N°05 · NEW COLLECTION</MonoTag>
-              <h2 className="ordi-display-lg">
-                <em>{lang === 'en' ? 'CLOUD FON' : 'เคล้าฝน'}</em>.
-              </h2>
-              <p>
-                {cloudFon
-                  ? cloudFon.excerpt[lang]
-                  : lang === 'en'
-                  ? "A perfume that doesn't arrive. It is already there."
-                  : 'น้ำหอมที่ไม่ได้มาถึง มันอยู่ที่นั่นแล้ว'}
-              </p>
-              <div className="ordi-skinscent__notes">
-                <div>
-                  <MonoTag>{t.product.top}</MonoTag>
-                  {skin.notes.top.join(' · ')}
-                </div>
-                <div>
-                  <MonoTag>{t.product.heart}</MonoTag>
-                  {skin.notes.heart.join(' · ')}
-                </div>
-                <div>
-                  <MonoTag>{t.product.base}</MonoTag>
-                  {skin.notes.base.join(' · ')}
-                </div>
-              </div>
-              <Link
-                href="/journal/cloud-fon-scent-of-air"
-                className="ordi-btn ordi-btn--primary"
-              >
-                {t.cta.sold_out} →
-              </Link>
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* PRESS QUOTES */}
       <section className="ordi-press" data-reveal>

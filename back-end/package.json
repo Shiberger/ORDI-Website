@@ -1,0 +1,22 @@
+{
+  "name": "ordi-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "seed": "tsx scripts/seed.ts",
+    "create-admin": "tsx scripts/create-admin.ts",
+    "make-admin": "tsx scripts/make-admin.ts",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ordi/shared": "*",
+    "@supabase/supabase-js": "^2.47.10"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "dotenv": "^16.4.7",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}

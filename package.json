@@ -1,0 +1,23 @@
+{
+  "name": "ordi-website",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "front-end",
+    "admin",
+    "back-end",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=ordi-web",
+    "dev:admin": "npm run dev --workspace=ordi-admin",
+    "build": "npm run build --workspace=ordi-web",
+    "build:admin": "npm run build --workspace=ordi-admin",
+    "build:all": "npm run build --workspace=ordi-web && npm run build --workspace=ordi-admin",
+    "seed": "npm run seed --workspace=ordi-backend",
+    "create-admin": "npm run create-admin --workspace=ordi-backend --",
+    "make-admin": "npm run make-admin --workspace=ordi-backend --",
+    "type-check": "npm run type-check --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present"
+  }
+}

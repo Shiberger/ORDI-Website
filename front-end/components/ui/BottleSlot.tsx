@@ -40,6 +40,9 @@ export function BottleSlot({
           sizes={sizes}
           quality={quality}
           priority={priority}
+          // Bundled art carries a build-time blurDataURL; uploaded art is a bare
+          // URL, so it fades in over the slot background instead.
+          placeholder={typeof image === 'object' ? 'blur' : undefined}
         />
       ) : (
         <div className="ordi-slot__inner">

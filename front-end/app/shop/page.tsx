@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { products } from '@/lib/data/products'
 import { getProductImage } from '@/lib/data/product-images'
 import { useApp } from '@/lib/context/AppContext'
 import { MonoTag } from '@/components/ui/MonoTag'
@@ -12,11 +11,14 @@ import { cn, formatPrice, isDarkHue } from '@/lib/utils'
 type Filter = 'all' | 'available' | 'coming-soon'
 
 export default function ShopPage() {
-  const { t, lang } = useApp()
+  const { t, lang, products } = useApp()
   const [filter, setFilter] = useState<Filter>('all')
   const [hover, setHover] = useState<string | null>(null)
 
   const visible = products.filter((p) => filter === 'all' || p.status === filter)
+  // With the whole collection shipping there is nothing behind this tab, so it
+  // only appears once something is actually upcoming again.
+  const hasUpcoming = products.some((p) => p.status === 'coming-soon')
 
   return (
     <main className="ordi-shop">
@@ -32,7 +34,7 @@ export default function ShopPage() {
             [
               { id: 'all', label: lang === 'en' ? 'All' : 'ทั้งหมด' },
               { id: 'available', label: lang === 'en' ? 'In stock' : 'พร้อมส่ง' },
-              { id: 'coming-soon', label: t.coming_soon },
+              ...(hasUpcoming ? [{ id: 'coming-soon', label: t.coming_soon }] : []),
             ] as { id: Filter; label: string }[]
           ).map((f) => (
             <button
@@ -126,7 +128,7 @@ export default function ShopPage() {
             <>
               <div className="ordi-galcard__media" style={{ background: p.hue }}>
                 <BottleSlot
-                  image={getProductImage(p.id)}
+                  image={getProductImage(p)}
                   placeholder={`${p.name} — bottle on ${isDarkHue(p.hue) ? 'dark' : 'neutral'} backdrop`}
                   alt={`${p.name} ${p.number} — eau de parfum`}
                   sizes="100vw"

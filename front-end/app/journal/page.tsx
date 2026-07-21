@@ -2,13 +2,12 @@
 
 import Link from 'next/link'
 import { useApp } from '@/lib/context/AppContext'
-import { journal } from '@/lib/data/journal'
 import { MonoTag } from '@/components/ui/MonoTag'
 import { BottleSlot } from '@/components/ui/BottleSlot'
-import FeatureImage from '@/assets/journal/cloud-fon_feature_article.png'
+import FeatureImage from '@/assets/journal/cloud-fon_feature_article.webp'
 
 export default function JournalPage() {
-  const { lang } = useApp()
+  const { lang, journal } = useApp()
   const feature = journal[0]
   return (
     <main className="ordi-journal">

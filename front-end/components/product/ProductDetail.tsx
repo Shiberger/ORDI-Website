@@ -2,8 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { products } from '@/lib/data/products'
-import { getProductImage } from '@/lib/data/product-images'
+import { getProductGallery, getProductImage } from '@/lib/data/product-images'
 import { useApp } from '@/lib/context/AppContext'
 import { MonoTag } from '@/components/ui/MonoTag'
 import { SectionHead } from '@/components/ui/SectionHead'
@@ -14,7 +13,7 @@ import type { Product } from '@/types/product'
 type Props = { product: Product }
 
 export function ProductDetail({ product: p }: Props) {
-  const { t, lang, wishlist, toggleWishlist } = useApp()
+  const { t, lang, wishlist, toggleWishlist, products, addToCart } = useApp()
   const [size, setSize] = useState(p.sizes[0].ml)
   const [hoverNote, setHoverNote] = useState<string | null>(null)
   const selectedSize = p.sizes.find((s) => s.ml === size) ?? p.sizes[0]
@@ -23,6 +22,7 @@ export function ProductDetail({ product: p }: Props) {
   const dark = isDarkHue(p.hue)
 
   const others = products.filter((x) => x.id !== p.id).slice(0, 3)
+  const gallery = getProductGallery(p.id)
 
   return (
     <main className="ordi-product">
@@ -34,7 +34,7 @@ export function ProductDetail({ product: p }: Props) {
       <section className="ordi-product__top">
         <div className="ordi-product__media" style={{ background: p.hue }}>
           <BottleSlot
-            image={getProductImage(p.id)}
+            image={getProductImage(p)}
             placeholder={`${p.name} — large editorial bottle shot`}
             alt={`${p.name} ${p.number} — editorial bottle shot`}
             sizes="(max-width: 768px) 100vw, 50vw"
@@ -95,14 +95,12 @@ export function ProductDetail({ product: p }: Props) {
                 {t.cta.sold_out} — {formatPrice(selectedSize.price)} {t.currency}
               </button>
             ) : (
-              <a
+              <button
                 className="ordi-btn ordi-btn--primary ordi-btn--lg"
-                href="https://shopee.co.th/ordi.bkk#product_list"
-                target="_blank"
-                rel="noopener noreferrer"
+                onClick={() => addToCart(p.id, selectedSize.ml)}
               >
-                {t.cta.shop_online} — {formatPrice(selectedSize.price)} {t.currency}
-              </a>
+                {t.cta.add_to_cart} — {formatPrice(selectedSize.price)} {t.currency}
+              </button>
             )}
             <button
               className={cn('ordi-btn ordi-btn--icon', saved && 'is-saved')}
@@ -131,6 +129,22 @@ export function ProductDetail({ product: p }: Props) {
           </ul>
         </div>
       </section>
+
+      {gallery.length > 0 && (
+        <section className="ordi-product__gallery" aria-label={`${p.name} — gallery`}>
+          {gallery.map((plate, i) => (
+            <div className="ordi-product__plate" key={i} style={{ background: p.hue }}>
+              <BottleSlot
+                image={plate.image}
+                placeholder={plate.alt[lang]}
+                alt={plate.alt[lang]}
+                sizes="(max-width: 767px) 50vw, (max-width: 1100px) 33vw, 25vw"
+                quality={88}
+              />
+            </div>
+          ))}
+        </section>
+      )}
 
       <section className="ordi-pyramid">
         <header className="ordi-pyramid__head">
@@ -219,7 +233,7 @@ export function ProductDetail({ product: p }: Props) {
             <Link className="ordi-pcard" key={o.id} href={`/shop/${o.id}`}>
               <div className="ordi-pcard__media" style={{ background: o.hue }}>
                 <BottleSlot
-                  image={getProductImage(o.id)}
+                  image={getProductImage(o)}
                   placeholder={o.name}
                   alt={`${o.name} ${o.number}`}
                   sizes="(max-width: 768px) 100vw, 33vw"
