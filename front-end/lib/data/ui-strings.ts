@@ -24,6 +24,7 @@ export type UIStrings = {
   cta: {
     shop_all: string
     add_to_cart: string
+    order_on_shopee: string
     sold_out: string
     view_product: string
     checkout: string
@@ -46,6 +47,7 @@ export type UIStrings = {
     story: string
   }
   coming_soon: string
+  shopee_note: string
   now_available: string
   sold_out: string
   empty_cart: string
@@ -66,6 +68,7 @@ export const uiStrings: Record<Lang, UIStrings> = {
     cta: {
       shop_all: 'Shop the collection',
       add_to_cart: 'Add to cart',
+      order_on_shopee: 'Order on Shopee',
       sold_out: 'Notify me',
       view_product: 'View',
       checkout: 'Proceed to checkout',
@@ -106,6 +109,7 @@ export const uiStrings: Record<Lang, UIStrings> = {
       channel_email_desc: 'For wholesale, press, collaborations, and anything that needs a longer reply.',
     },
     coming_soon: 'Coming soon',
+    shopee_note: 'Orders and payment are handled on our official Shopee store.',
     now_available: 'Now available',
     sold_out: 'Sold out',
     empty_cart: 'Your cart is empty.',
@@ -124,6 +128,7 @@ export const uiStrings: Record<Lang, UIStrings> = {
     cta: {
       shop_all: 'ดูคอลเลกชั่นทั้งหมด',
       add_to_cart: 'เพิ่มลงตะกร้า',
+      order_on_shopee: 'สั่งซื้อผ่าน Shopee',
       sold_out: 'แจ้งเตือนเมื่อมีสินค้า',
       view_product: 'ดูสินค้า',
       checkout: 'ดำเนินการชำระเงิน',
@@ -164,6 +169,7 @@ export const uiStrings: Record<Lang, UIStrings> = {
       channel_email_desc: 'สำหรับการขายส่ง สื่อมวลชน คอลแลบ และเรื่องที่ต้องการคำตอบยาว ๆ',
     },
     coming_soon: 'เร็วๆ นี้',
+    shopee_note: 'สั่งซื้อและชำระเงินผ่านร้านค้าทางการของเราบน Shopee',
     now_available: 'วางจำหน่ายแล้ว',
     sold_out: 'สินค้าหมด',
     empty_cart: 'ตะกร้าของคุณว่างเปล่า',

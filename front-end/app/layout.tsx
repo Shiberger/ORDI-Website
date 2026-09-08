@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Geist_Mono } from 'next/font/google'
 import { AppProvider } from '@/lib/context/AppContext'
+import { CHECKOUT_ENABLED } from '@/lib/commerce'
 import { getJournal, getProducts } from '@/lib/data/catalog'
 import { Nav } from '@/components/layout/Nav'
 import { Footer } from '@/components/layout/Footer'
@@ -68,7 +69,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             {children}
             <Footer />
           </SmoothScroll>
-          <CartDrawer />
+          {CHECKOUT_ENABLED && <CartDrawer />}
           <MobileMenu />
         </AppProvider>
       </body>

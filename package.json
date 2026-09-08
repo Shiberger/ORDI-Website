@@ -15,6 +15,8 @@
     "build:admin": "npm run build --workspace=ordi-admin",
     "build:all": "npm run build --workspace=ordi-web && npm run build --workspace=ordi-admin",
     "seed": "npm run seed --workspace=ordi-backend",
+    "set-prices": "npm run set-prices --workspace=ordi-backend",
+    "inspect-catalog": "npm run inspect-catalog --workspace=ordi-backend",
     "create-admin": "npm run create-admin --workspace=ordi-backend --",
     "make-admin": "npm run make-admin --workspace=ordi-backend --",
     "type-check": "npm run type-check --workspaces --if-present",

@@ -143,8 +143,8 @@ export const seedProducts: Product[] = [
       base: ['Oakmoss', 'Warm Skin Musk'],
     },
     sizes: [
-      { ml: 50, price: 1490 },
-      { ml: 12, price: 490 },
+      { ml: 50, price: 1690 },
+      { ml: 12, price: 590 },
     ],
     status: 'available',
     hue: '#1C2A20',
