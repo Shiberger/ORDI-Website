@@ -9,6 +9,7 @@ import {
   type ShippingAddress,
 } from '@ordi/shared'
 import { getProducts } from '@/lib/data/catalog'
+import { CHECKOUT_ENABLED } from '@/lib/commerce'
 import { getStripe, isStripeConfigured } from '@/lib/stripe/server'
 import { isCarrier, shippingCostFor } from '@/lib/shipping'
 
@@ -35,6 +36,12 @@ function str(value: unknown): string {
 }
 
 export async function POST(request: Request) {
+  // Orders go through Shopee for now. The UI no longer reaches this route, but
+  // the endpoint has to refuse on its own — hiding a button is not closing a
+  // door, and this one creates orders and charges cards.
+  if (!CHECKOUT_ENABLED) {
+    return bad('Online checkout is closed — orders are taken on Shopee.', 503)
+  }
   if (!isStripeConfigured()) {
     return bad('Payments are not configured yet.', 503)
   }

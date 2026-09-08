@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import { useApp } from '@/lib/context/AppContext'
+import { CHECKOUT_ENABLED, SHOPEE_STORE_URL } from '@/lib/commerce'
 import { cn } from '@/lib/utils'
 
 export function MobileMenu() {
@@ -76,10 +77,23 @@ export function MobileMenu() {
       </nav>
 
       <footer className="ordi-mobilemenu__foot">
-        <button type="button" className="ordi-mobilemenu__cart" onClick={openCart}>
-          <span>{t.nav.cart}</span>
-          <span>[{String(cartCount).padStart(2, '0')}]</span>
-        </button>
+        {CHECKOUT_ENABLED ? (
+          <button type="button" className="ordi-mobilemenu__cart" onClick={openCart}>
+            <span>{t.nav.cart}</span>
+            <span>[{String(cartCount).padStart(2, '0')}]</span>
+          </button>
+        ) : (
+          <a
+            className="ordi-mobilemenu__cart"
+            href={SHOPEE_STORE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={close}
+          >
+            <span>Shopee</span>
+            <span>↗</span>
+          </a>
+        )}
         <span className="ordi-mobilemenu__origin">{t.origin}</span>
       </footer>
     </div>

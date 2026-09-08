@@ -34,3 +34,7 @@ next-env.d.ts
 
 # Vercel
 .vercel
+
+# Photography masters — 2.8 GB of PSD/PNG originals kept locally.
+# Only the WebP derivatives under front-end/assets/products/ ship in the repo.
+front-end/assets/Photography/

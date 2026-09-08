@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useApp } from '@/lib/context/AppContext'
+import { CHECKOUT_ENABLED, SHOPEE_STORE_URL } from '@/lib/commerce'
 import { cn } from '@/lib/utils'
 
 export function Nav() {
@@ -61,10 +62,24 @@ export function Nav() {
           })}
         </nav>
         <div className="ordi-nav__right">
-          <button className="ordi-nav__cart" onClick={() => setDrawerOpen(true)}>
-            <span>{t.nav.cart}</span>
-            <span className="ordi-nav__cart-count">[{String(cartCount).padStart(2, '0')}]</span>
-          </button>
+          {CHECKOUT_ENABLED ? (
+            <button className="ordi-nav__cart" onClick={() => setDrawerOpen(true)}>
+              <span>{t.nav.cart}</span>
+              <span className="ordi-nav__cart-count">[{String(cartCount).padStart(2, '0')}]</span>
+            </button>
+          ) : (
+            /* The cart is withdrawn, so the slot it held goes to the channel
+               that actually takes orders. */
+            <a
+              className="ordi-nav__cart"
+              href={SHOPEE_STORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span>Shopee</span>
+              <span className="ordi-nav__cart-count">↗</span>
+            </a>
+          )}
         </div>
       </div>
     </header>

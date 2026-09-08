@@ -1293,6 +1293,18 @@ main {
   color: var(--ink-soft);
 }
 
+/* Shown in place of a cart summary while orders are taken on Shopee */
+.ordi-product__shopnote {
+  margin: 16px 0 0 0;
+  padding-top: 16px;
+  border-top: 1px solid rgba(10, 10, 10, 0.12);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
 /* Product gallery — extra stills under the hero, only for shoots that have them */
 .ordi-product__gallery {
   margin-top: 32px;

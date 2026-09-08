@@ -2,12 +2,13 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { getProductGallery, getProductImage } from '@/lib/data/product-images'
+import { getProductGallery, getProductImage, heroIsDark } from '@/lib/data/product-images'
 import { useApp } from '@/lib/context/AppContext'
+import { CHECKOUT_ENABLED, SHOPEE_STORE_URL } from '@/lib/commerce'
 import { MonoTag } from '@/components/ui/MonoTag'
 import { SectionHead } from '@/components/ui/SectionHead'
 import { BottleSlot } from '@/components/ui/BottleSlot'
-import { cn, formatPrice, isDarkHue } from '@/lib/utils'
+import { cn, formatPrice } from '@/lib/utils'
 import type { Product } from '@/types/product'
 
 type Props = { product: Product }
@@ -19,7 +20,7 @@ export function ProductDetail({ product: p }: Props) {
   const selectedSize = p.sizes.find((s) => s.ml === size) ?? p.sizes[0]
   const saved = wishlist.includes(p.id)
   const isSoon = p.status === 'coming-soon'
-  const dark = isDarkHue(p.hue)
+  const dark = heroIsDark(p)
 
   const others = products.filter((x) => x.id !== p.id).slice(0, 3)
   const gallery = getProductGallery(p.id)
@@ -94,13 +95,23 @@ export function ProductDetail({ product: p }: Props) {
               >
                 {t.cta.sold_out} — {formatPrice(selectedSize.price)} {t.currency}
               </button>
-            ) : (
+            ) : CHECKOUT_ENABLED ? (
               <button
                 className="ordi-btn ordi-btn--primary ordi-btn--lg"
                 onClick={() => addToCart(p.id, selectedSize.ml)}
               >
                 {t.cta.add_to_cart} — {formatPrice(selectedSize.price)} {t.currency}
               </button>
+            ) : (
+              <a
+                className="ordi-btn ordi-btn--primary ordi-btn--lg"
+                href={SHOPEE_STORE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t.cta.order_on_shopee} — {formatPrice(selectedSize.price)}{' '}
+                {t.currency} ↗
+              </a>
             )}
             <button
               className={cn('ordi-btn ordi-btn--icon', saved && 'is-saved')}
@@ -110,6 +121,10 @@ export function ProductDetail({ product: p }: Props) {
               {saved ? '♥' : '♡'}
             </button>
           </div>
+
+          {!CHECKOUT_ENABLED && !isSoon && (
+            <p className="ordi-product__shopnote">{t.shopee_note}</p>
+          )}
 
           <ul className="ordi-product__perks">
             <li>
